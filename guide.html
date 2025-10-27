@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Warm-up Guide - Threads VA</title>
+    <style>
+        :root {
+            --primary: #8B5CF6;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --dark: #1F2937;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--dark);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: #F3F4F6;
+            border-bottom: 2px solid #E5E7EB;
+            flex-wrap: wrap;
+        }
+        
+        .nav-tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .nav-tab.active {
+            background: white;
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            padding: 30px;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        .grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        
+        .card {
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .warmup-step {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .warmup-step.active {
+            border-color: var(--primary);
+            background: #F0F4FF;
+        }
+        
+        .warmup-step.completed {
+            border-color: var(--success);
+            background: #F0FDF4;
+        }
+        
+        .step-number {
+            background: var(--primary);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .step-number.completed {
+            background: var(--success);
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-time {
+            background: var(--warning);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #E5E7EB;
+        }
+        
+        .checklist-item input {
+            margin-right: 10px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #E5E7EB;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            transition: width 0.5s ease;
+        }
+        
+        .timer-display {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            color: var(--primary);
+            margin: 20px 0;
+        }
+        
+        .target-accounts {
+            background: #FFFBEB;
+            border: 1px solid #FCD34D;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .account-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .account-item {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #E5E7EB;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tab {
+                min-width: 100px;
+                font-size: 14px;
+                padding: 12px 10px;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .timer-display {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔥 Complete Warm-up Guide</h1>
+            <p>Step-by-Step Account Warm-up Process for Maximum Growth</p>
+        </header>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('guide')">📋 Step-by-Step</button>
+            <button class="nav-tab" onclick="switchTab('timer')">⏰ Guided Timer</button>
+            <button class="nav-tab" onclick="switchTab('checklist')">✅ Checklist</button>
+            <button class="nav-tab" onclick="switchTab('targets')">🎯 Target Accounts</button>
+            <button class="nav-tab" onclick="switchTab('tips')">💡 Pro Tips</button>
+        </div>
+        
+        <div class="tab-content">
+            <!-- Step-by-Step Guide Tab -->
+            <div id="guide" class="tab-pane active">
+                <div class="card">
+                    <h3>🚀 Complete Warm-up Process (1.5 Hours Total)</h3>
+                    <p style="color: #6B7280; margin-bottom: 20px;">Follow these steps in order for optimal account growth</p>
+                    
+                    <div class="quick-actions">
+                        <button class="btn btn-primary" onclick="startGuidedWarmup()">🎮 Start Guided Warm-up</button>
+                        <button class="btn btn-success" onclick="copyAllTargets()">📋 Copy All Targets</button>
+                        <button class="btn" onclick="resetProgress()">🔄 Reset Progress</button>
+                    </div>
+                    
+                    <!-- Step 1: Account Creation -->
+                    <div class="warmup-step" id="step1">
+                        <div class="step-number" id="step1-number">1</div>
+                        <div class="step-content">
+                            <h4>📝 Account Creation (10 minutes)</h4>
+                            <p><strong>Instagram Setup:</strong></p>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step1-1" onchange="updateProgress()">
+                                <label for="step1-1">Model Name + 2 emojis (e.g., "Bella ❤️💋")</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step1-2" onchange="updateProgress()">
+                                <label for="step1-2">Username contains model name (e.g., "tiny_bella")</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step1-3" onchange="updateProgress()">
+                                <label for="step1-3">Adult DOB (19-21 years)</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step1-4" onchange="updateProgress()">
+                                <label for="step1-4">Outlook email (no model name in email)</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step1-5" onchange="updateProgress()">
+                                <label for="step1-5">Profile picture from content group</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step1-6" onchange="updateProgress()">
+                                <label for="step1-6">No bio - leave completely empty</label>
+                            </div>
+                        </div>
+                        <div class="step-time">10 mins</div>
+                    </div>
+                    
+                    <!-- Step 2: Instagram Warm-up -->
+                    <div class="warmup-step" id="step2">
+                        <div class="step-number" id="step2-number">2</div>
+                        <div class="step-content">
+                            <h4>📸 Instagram Warm-up (30 minutes)</h4>
+                            <p><strong>Follow these 5 accounts and engage naturally:</strong></p>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step2-1" onchange="updateProgress()">
+                                <label for="step2-1">Follow @realcamillaara - watch 3-5 reels completely</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step2-2" onchange="updateProgress()">
+                                <label for="step2-2">Follow @julia.filippo - watch 3-5 reels completely</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step2-3" onchange="updateProgress()">
+                                <label for="step2-3">Follow @alinnarosee - watch 3-5 reels completely</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step2-4" onchange="updateProgress()">
+                                <label for="step2-4">Follow @sophieraiin - watch 3-5 reels completely</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step2-5" onchange="updateProgress()">
+                                <label for="step2-5">Follow @avaxreyess - watch 3-5 reels completely</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step2-6" onchange="updateProgress()">
+                                <label for="step2-6">Cancel Instagram and reopen app</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step2-7" onchange="updateProgress()">
+                                <label for="step2-7">Scroll feed for 5-10 minutes</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step2-8" onchange="updateProgress()">
+                                <label for="step2-8">Like maximum 2 posts (NO COMMENTS)</label>
+                            </div>
+                        </div>
+                        <div class="step-time">30 mins</div>
+                    </div>
+                    
+                    <!-- Step 3: Threads Profile -->
+                    <div class="warmup-step" id="step3">
+                        <div class="step-number" id="step3-number">3</div>
+                        <div class="step-content">
+                            <h4>🧵 Threads Profile Setup (5 minutes)</h4>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step3-1" onchange="updateProgress()">
+                                <label for="step3-1">Import Instagram profile to Threads</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step3-2" onchange="updateProgress()">
+                                <label for="step3-2">Check name shows emojis correctly</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step3-3" onchange="updateProgress()">
+                                <label for="step3-3">If emojis missing, re-edit name on Instagram</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step3-4" onchange="updateProgress()">
+                                <label for="step3-4">Go to Profile → Edit Profile → Switch off IG badge</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step3-5" onchange="updateProgress()">
+                                <label for="step3-5">Note: IG badge might take hours to disappear</label>
+                            </div>
+                        </div>
+                        <div class="step-time">5 mins</div>
+                    </div>
+                    
+                    <!-- Step 4: Threads Warm-up -->
+                    <div class="warmup-step" id="step4">
+                        <div class="step-number" id="step4-number">4</div>
+                        <div class="step-content">
+                            <h4>🔥 Threads Warm-up (45 minutes)</h4>
+                            <p><strong>Follow these 6 accounts with proper engagement:</strong></p>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step4-1" onchange="updateProgress()">
+                                <label for="step4-1">Follow @maeve.duval - like 2 spaced posts first</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step4-2" onchange="updateProgress()">
+                                <label for="step4-2">Follow @8us.ruby - like 2 spaced posts first</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step4-3" onchange="updateProgress()">
+                                <label for="step4-3">Follow @kristyirwin46 - like 2 spaced posts first</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step4-4" onchange="updateProgress()">
+                                <label for="step4-4">Follow @mollyduvalxo - like 2 spaced posts first</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step4-5" onchange="updateProgress()">
+                                <label for="step4-5">Follow @sienna.rishette - like 2 spaced posts first</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step4-6" onchange="updateProgress()">
+                                <label for="step4-6">Follow @lia_finx - like 2 spaced posts first</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step4-7" onchange="updateProgress()">
+                                <label for="step4-7">Find & follow 1-2 USA men from comments</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step4-8" onchange="updateProgress()">
+                                <label for="step4-8">Drop outreach comments on 1-2 new posts</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step4-9" onchange="updateProgress()">
+                                <label for="step4-9">Scroll feed for 10-15 minutes (no engagement)</label>
+                            </div>
+                        </div>
+                        <div class="step-time">45 mins</div>
+                    </div>
+                    
+                    <!-- Step 5: Initial Posting -->
+                    <div class="warmup-step" id="step5">
+                        <div class="step-number" id="step5-number">5</div>
+                        <div class="step-content">
+                            <h4>📝 Initial Posting (15 minutes)</h4>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step5-1" onchange="updateProgress()">
+                                <label for="step5-1">Post "Hi threads, I'm [Name] ❤️" as first thread</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step5-2" onchange="updateProgress()">
+                                <label for="step5-2">PIN this first post immediately</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step5-3" onchange="updateProgress()">
+                                <label for="step5-3">Wait 5 minutes after pinning</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="step5-4" onchange="updateProgress()">
+                                <label for="step5-4">Post 3 more captions from spreadsheet</label>
+                            </div>
+                        </div>
+                        <div class="step-time">15 mins</div>
+                    </div>
+                    
+                    <!-- Progress Tracking -->
+                    <div style="margin-top: 30px; padding: 20px; background: #F8FAFC; border-radius: 10px;">
+                        <h4>📊 Warm-up Progress</h4>
+                        <div class="progress-bar">
+                            <div id="warmupProgress" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <p>Overall Progress: <span id="progressPercent">0%</span> complete</p>
+                        <p>Estimated Time Remaining: <span id="timeRemaining">1 hour 30 minutes</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Guided Timer Tab -->
+            <div id="timer" class="tab-pane">
+                <div class="card">
+                    <h3>⏰ Guided Warm-up Timer</h3>
+                    <p style="color: #6B7280; margin-bottom: 20px;">Follow along with timed sessions for perfect warm-up</p>
+                    
+                    <div class="timer-display" id="mainTimer">90:00</div>
+                    
+                    <div style="text-align: center; margin: 20px 0;">
+                        <button class="btn btn-primary" onclick="startMainTimer()">▶ Start Warm-up</button>
+                        <button class="btn btn-warning" onclick="pauseMainTimer()">⏸ Pause</button>
+                        <button class="btn" onclick="resetMainTimer()">🔄 Reset</button>
+                    </div>
+                    
+                    <div id="currentStep" style="padding: 15px; background: #F0F4FF; border-radius: 8px; margin: 15px 0;">
+                        <strong>Current Step:</strong> <span id="currentStepText">Ready to start</span>
+                    </div>
+                    
+                    <div class="grid">
+                        <div class="card">
+                            <h4>🕒 Step Timers</h4>
+                            <div style="margin-top: 15px;">
+                                <button class="btn" onclick="startStepTimer(10, 'Account Creation')">10m - Account Setup</button>
+                                <button class="btn" onclick="startStepTimer(30, 'Instagram Warm-up')">30m - IG Warm-up</button>
+                                <button class="btn" onclick="startStepTimer(5, 'Threads Setup')">5m - Threads Setup</button>
+                                <button class="btn" onclick="startStepTimer(45, 'Threads Warm-up')">45m - Threads Warm-up</button>
+                                <button class="btn" onclick="startStepTimer(15, 'Initial Posting')">15m - First Posts</button>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <h4>🔔 Notifications</h4>
+                            <div style="margin-top: 15px;">
+                                <label><input type="checkbox" id="soundNotifications" checked> Enable sound alerts</label><br>
+                                <label><input type="checkbox" id="browserNotifications" checked> Enable browser notifications</label><br>
+                                <label><input type="checkbox" id="autoAdvance"> Auto-advance steps</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Checklist Tab -->
+            <div id="checklist" class="tab-pane">
+                <div class="card">
+                    <h3>✅ Quick Warm-up Checklist</h3>
+                    <p style="color: #6B7280; margin-bottom: 20px;">Fast checklist for experienced VAs</p>
+                    
+                    <div class="quick-actions">
+                        <button class="btn btn-primary" onclick="checkAll()">✓ Check All</button>
+                        <button class="btn" onclick="uncheckAll()">✗ Uncheck All</button>
+                        <button class="btn btn-success" onclick="saveChecklist()">💾 Save Progress</button>
+                    </div>
+                    
+                    <div id="quickChecklist" style="margin-top: 20px;">
+                        <!-- Checklist items will be generated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Target Accounts Tab -->
+            <div id="targets" class="tab-pane">
+                <div class="card">
+                    <h3>🎯 Target Accounts for Warm-up</h3>
+                    <p style="color: #6B7280; margin-bottom: 20px;">Pre-approved accounts for safe and effective warm-up</p>
+                    
+                    <div class="target-accounts">
+                        <h4>📸 Instagram Targets (Follow + Watch Reels)</h4>
+                        <div class="account-list">
+                            <div class="account-item">@realcamillaara</div>
+                            <div class="account-item">@julia.filippo</div>
+                            <div class="account-item">@alinnarosee</div>
+                            <div class="account-item">@sophieraiin</div>
+                            <div class="account-item">@avaxreyess</div>
+                        </div>
+                        <button class="btn" onclick="copyInstagramTargets()" style="margin-top: 10px;">📋 Copy Instagram Targets</button>
+                    </div>
+                    
+                    <div class="target-accounts">
+                        <h4>🧵 Threads Targets (Follow + Engage)</h4>
+                        <div class="account-list">
+                            <div class="account-item">@maeve.duval</div>
+                            <div class="account-item">@8us.ruby</div>
+                            <div class="account-item">@kristyirwin46</div>
+                            <div class="account-item">@mollyduvalxo</div>
+                            <div class="account-item">@sienna.rishette</div>
+                            <div class="account-item">@lia_finx</div>
+                        </div>
+                        <button class="btn" onclick="copyThreadsTargets()" style="margin-top: 10px;">📋 Copy Threads Targets</button>
+                    </div>
+                    
+                    <div class="target-accounts">
+                        <h4>🔗 Mother Pages (For Link Posts)</h4>
+                        <div class="account-list">
+                            <div class="account-item">@sashaaxxcute</div>
+                            <div class="account-item">@sexxysashalove</div>
+                        </div>
+                        <button class="btn" onclick="copyMotherPages()" style="margin-top: 10px;">📋 Copy Mother Pages</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pro Tips Tab -->
+            <div id="tips" class="tab-pane">
+                <div class="grid">
+                    <div class="card">
+                        <h3>💡 Warm-up Best Practices</h3>
+                        <div style="margin-top: 15px;">
+                            <p><strong>✅ DO:</strong></p>
+                            <ul style="margin-left: 20px; margin-top: 10px;">
+                                <li>Watch reels completely before following</li>
+                                <li>Space out likes (2 per account maximum)</li>
+                                <li>Scroll naturally between actions</li>
+                                <li>Use different engagement patterns</li>
+                                <li>Wait proper time between steps</li>
+                            </ul>
+                            
+                            <p style="margin-top: 15px;"><strong>❌ DON'T:</strong></p>
+                            <ul style="margin-left: 20px; margin-top: 10px;">
+                                <li>Rush through the process</li>
+                                <li>Like too many posts at once</li>
+                                <li>Comment during initial warm-up</li>
+                                <li>Use the same pattern every time</li>
+                                <li>Skip any warm-up steps</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>🚨 Troubleshooting</h3>
+                        <div style="margin-top: 15px;">
+                            <p><strong>Problem:</strong> Views not showing</p>
+                            <p><strong>Solution:</strong> Instagram suspended - appeal with video verification</p>
+                            
+                            <p style="margin-top: 10px;"><strong>Problem:</strong> Immediate suspension</p>
+                            <p><strong>Solution:</strong> Phone IP flagged - reset phone or use VPN</p>
+                            
+                            <p style="margin-top: 10px;"><strong>Problem:</strong> Can't comment</p>
+                            <p><strong>Solution:</strong> Comment restriction - wait for period to end</p>
+                            
+                            <p style="margin-top: 10px;"><strong>Problem:</strong> Posts not uploading</p>
+                            <p><strong>Solution:</strong> Shadow ban - stop posting for 12-24 hours</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 20px;">
+                    <h3>📊 Warm-up Success Metrics</h3>
+                    <div class="grid">
+                        <div class="card">
+                            <h4>✅ Good Signs</h4>
+                            <ul style="margin-left: 20px; margin-top: 10px;">
+                                <li>50-100 views on first day</li>
+                                <li>Steady follower growth</li>
+                                <li>Natural engagement patterns</li>
+                                <li>No immediate restrictions</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card">
+                            <h4>⚠️ Warning Signs</h4>
+                            <ul style="margin-left: 20px; margin-top: 10px;">
+                                <li>0 views after 24 hours</li>
+                                <li>Immediate account suspension</li>
+                                <li>Cannot like or comment</li>
+                                <li>Posts failing to upload</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Warm-up Guide Class
+        class WarmupGuide {
+            constructor() {
+                this.totalSteps = 5;
+                this.currentStep = 1;
+                this.mainTimer = null;
+                this.stepTimer = null;
+                this.totalTime = 90 * 60; // 90 minutes in seconds
+                this.remainingTime = this.totalTime;
+                this.isRunning = false;
+                this.checklistProgress = JSON.parse(localStorage.getItem('warmup_checklist')) || {};
+                this.init();
+            }
+
+            init() {
+                this.updateProgress();
+                this.renderQuickChecklist();
+                this.loadChecklistProgress();
+            }
+
+            updateProgress() {
+                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+                const total = checkboxes.length;
+                const progress = (checked / total) * 100;
+                
+                document.getElementById('warmupProgress').style.width = progress + '%';
+                document.getElementById('progressPercent').textContent = Math.round(progress) + '%';
+                
+                // Update time remaining estimate
+                const estimatedMinutes = Math.round((100 - progress) / 100 * 90);
+                document.getElementById('timeRemaining').textContent = `${estimatedMinutes} minutes`;
+                
+                // Update step completion status
+                this.updateStepCompletion();
+            }
+
+            updateStepCompletion() {
+                for (let i = 1; i <= this.totalSteps; i++) {
+                    const stepCheckboxes = document.querySelectorAll(`#step${i} input[type="checkbox"]`);
+                    const stepChecked = Array.from(stepCheckboxes).filter(cb => cb.checked).length;
+                    const stepTotal = stepCheckboxes.length;
+                    const stepProgress = (stepChecked / stepTotal) * 100;
+                    
+                    const stepElement = document.getElementById(`step${i}`);
+                    const stepNumber = document.getElementById(`step${i}-number`);
+                    
+                    if (stepProgress === 100) {
+                        stepElement.classList.add('completed');
+                        stepElement.classList.remove('active');
+                        stepNumber.classList.add('completed');
+                    } else if (i === this.currentStep) {
+                        stepElement.classList.add('active');
+                        stepElement.classList.remove('completed');
+                    } else {
+                        stepElement.classList.remove('active', 'completed');
+                    }
+                }
+            }
+
+            startMainTimer() {
+                if (this.isRunning) return;
+                
+                this.isRunning = true;
+                this.mainTimer = setInterval(() => {
+                    this.remainingTime--;
+                    this.updateTimerDisplay();
+                    
+                    if (this.remainingTime <= 0) {
+                        this.completeWarmup();
+                    }
+                    
+                    // Auto-advance steps based on time
+                    this.autoAdvanceSteps();
+                }, 1000);
+                
+                this.showNotification('Warm-up timer started! 🔥', 'success');
+            }
+
+            pauseMainTimer() {
+                this.isRunning = false;
+                if (this.mainTimer) {
+                    clearInterval(this.mainTimer);
+                    this.mainTimer = null;
+                }
+                this.showNotification('Timer paused ⏸', 'warning');
+            }
+
+            resetMainTimer() {
+                this.pauseMainTimer();
+                this.remainingTime = this.totalTime;
+                this.currentStep = 1;
+                this.updateTimerDisplay();
+                this.updateCurrentStepText('Ready to start');
+                this.showNotification('Timer reset 🔄', 'success');
+            }
+
+            updateTimerDisplay() {
+                const minutes = Math.floor(this.remainingTime / 60);
+                const seconds = this.remainingTime % 60;
+                document.getElementById('mainTimer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            autoAdvanceSteps() {
+                const stepTimes = [10, 30, 5, 45, 15]; // minutes for each step
+                let timeElapsed = this.totalTime - this.remainingTime;
+                let cumulativeTime = 0;
+                
+                for (let i = 0; i < stepTimes.length; i++) {
+                    cumulativeTime += stepTimes[i] * 60;
+                    if (timeElapsed < cumulativeTime && this.currentStep !== i + 1) {
+                        this.currentStep = i + 1;
+                        this.updateCurrentStepText(this.getStepName(this.currentStep));
+                        break;
+                    }
+                }
+            }
+
+            getStepName(stepNumber) {
+                const stepNames = [
+                    'Account Creation',
+                    'Instagram Warm-up', 
+                    'Threads Profile Setup',
+                    'Threads Warm-up',
+                    'Initial Posting'
+                ];
+                return stepNames[stepNumber - 1] || 'Unknown Step';
+            }
+
+            updateCurrentStepText(stepText) {
+                document.getElementById('currentStepText').textContent = stepText;
+            }
+
+            startStepTimer(minutes, stepName) {
+                this.updateCurrentStepText(stepName);
+                
+                let timeLeft = minutes * 60;
+                const stepTimerDisplay = document.getElementById('mainTimer');
+                
+                if (this.stepTimer) {
+                    clearInterval(this.stepTimer);
+                }
+                
+                this.stepTimer = setInterval(() => {
+                    timeLeft--;
+                    const min = Math.floor(timeLeft / 60);
+                    const sec = timeLeft % 60;
+                    stepTimerDisplay.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(this.stepTimer);
+                        this.showNotification(`${stepName} timer finished! ✅`, 'success');
+                    }
+                }, 1000);
+                
+                this.showNotification(`${stepName} timer started for ${minutes} minutes`, 'success');
+            }
+
+            completeWarmup() {
+                this.pauseMainTimer();
+                this.showNotification('🎉 Warm-up completed! Your account is ready for posting!', 'success');
+                
+                // Check all checkboxes
+                document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = true;
+                });
+                this.updateProgress();
+            }
+
+            renderQuickChecklist() {
+                const quickItems = [
+                    'Account created with correct details',
+                    'Instagram profile picture set',
+                    '5 target IG accounts followed',
+                    'Reels watched completely',
+                    'Threads profile imported',
+                    'IG badge turned off',
+                    '6 target Threads accounts followed',
+                    '2 USA men followed from comments',
+                    'Outreach comments posted',
+                    'First thread posted and pinned',
+                    '3 additional posts published',
+                    'Fediverse activated'
+                ];
+                
+                const container = document.getElementById('quickChecklist');
+                container.innerHTML = quickItems.map((item, index) => `
+                    <div class="checklist-item">
+                        <input type="checkbox" id="quick-${index}" onchange="warmupGuide.saveChecklistProgress()">
+                        <label for="quick-${index}">${item}</label>
+                    </div>
+                `).join('');
+            }
+
+            loadChecklistProgress() {
+                Object.keys(this.checklistProgress).forEach(key => {
+                    const checkbox = document.getElementById(key);
+                    if (checkbox) {
+                        checkbox.checked = this.checklistProgress[key];
+                    }
+                });
+                this.updateProgress();
+            }
+
+            saveChecklistProgress() {
+                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                this.checklistProgress = {};
+                
+                checkboxes.forEach(checkbox => {
+                    this.checklistProgress[checkbox.id] = checkbox.checked;
+                });
+                
+                localStorage.setItem('warmup_checklist', JSON.stringify(this.checklistProgress));
+                this.updateProgress();
+                this.showNotification('Progress saved! 💾', 'success');
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.style.background = type === 'success' ? '#10B981' : type === 'warning' ? '#F59E0B' : '#EF4444';
+                notification.style.display = 'block';
+                
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+                
+                // Play sound if enabled
+                if (document.getElementById('soundNotifications')?.checked) {
+                    this.playNotificationSound();
+                }
+            }
+
+            playNotificationSound() {
+                // Simple beep sound
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            }
+        }
+
+        // Global functions
+        let warmupGuide;
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-pane').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(button => button.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function startGuidedWarmup() {
+            warmupGuide.startMainTimer();
+            switchTab('timer');
+        }
+
+        function updateProgress() {
+            warmupGuide.updateProgress();
+        }
+
+        function startMainTimer() {
+            warmupGuide.startMainTimer();
+        }
+
+        function pauseMainTimer() {
+            warmupGuide.pauseMainTimer();
+        }
+
+        function resetMainTimer() {
+            warmupGuide.resetMainTimer();
+        }
+
+        function startStepTimer(minutes, stepName) {
+            warmupGuide.startStepTimer(minutes, stepName);
+        }
+
+        function checkAll() {
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            warmupGuide.updateProgress();
+            warmupGuide.saveChecklistProgress();
+        }
+
+        function uncheckAll() {
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            warmupGuide.updateProgress();
+            warmupGuide.saveChecklistProgress();
+        }
+
+        function saveChecklist() {
+            warmupGuide.saveChecklistProgress();
+        }
+
+        function resetProgress() {
+            if (confirm('Reset all warm-up progress?')) {
+                uncheckAll();
+                warmupGuide.resetMainTimer();
+                localStorage.removeItem('warmup_checklist');
+                warmupGuide.showNotification('Progress reset! 🔄', 'success');
+            }
+        }
+
+        // Copy functions for target accounts
+        function copyInstagramTargets() {
+            const targets = `@realcamillaara\n@julia.filippo\n@alinnarosee\n@sophieraiin\n@avaxreyess`;
+            copyToClipboard(targets, 'Instagram targets copied! 📋');
+        }
+
+        function copyThreadsTargets() {
+            const targets = `@maeve.duval\n@8us.ruby\n@kristyirwin46\n@mollyduvalxo\n@sienna.rishette\n@lia_finx`;
+            copyToClipboard(targets, 'Threads targets copied! 📋');
+        }
+
+        function copyMotherPages() {
+            const targets = `@sashaaxxcute\n@sexxysashalove`;
+            copyToClipboard(targets, 'Mother pages copied! 📋');
+        }
+
+        function copyAllTargets() {
+            const targets = `Instagram Targets:\n@realcamillaara, @julia.filippo, @alinnarosee, @sophieraiin, @avaxreyess\n\nThreads Targets:\n@maeve.duval, @8us.ruby, @kristyirwin46, @mollyduvalxo, @sienna.rishette, @lia_finx\n\nMother Pages:\n@sashaaxxcute, @sexxysashalove`;
+            copyToClipboard(targets, 'All targets copied! 📋');
+        }
+
+        function copyToClipboard(text, message) {
+            navigator.clipboard.writeText(text).then(() => {
+                warmupGuide.showNotification(message, 'success');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                warmupGuide.showNotification(message, 'success');
+            });
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            warmupGuide = new WarmupGuide();
+            
+            // Request notification permission
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        });
+    </script>
+</body>
+</html>

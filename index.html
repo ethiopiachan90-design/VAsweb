@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VA Tools Hub - Central Dashboard</title>
+    <style>
+        :root {
+            --primary: #8B5CF6;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --dark: #1F2937;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--dark);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .main-content {
+            padding: 30px;
+        }
+        
+        .tools-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+        
+        .tool-card {
+            background: white;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15);
+        }
+        
+        .tool-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        
+        .tool-card h3 {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .tool-card p {
+            color: #6B7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .quick-stats {
+            background: #F8FAFC;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .url-box {
+            background: #F3F4F6;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .url-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #D1D5DB;
+            border-radius: 6px;
+            font-size: 14px;
+            text-align: center;
+            margin: 5px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 VA Tools Hub</h1>
+            <p>All Your Threads VA Tools in One Place</p>
+        </header>
+        
+        <div class="main-content">
+            <!-- Quick Stats -->
+            <div class="quick-stats">
+                <h3>📊 Your VA Toolkit</h3>
+                <p>Access all your tools instantly from any device</p>
+            </div>
+            
+            <!-- Tools Grid -->
+            <div class="tools-grid">
+                <!-- Captions Manager -->
+                <a href="caption.html" class="tool-card">
+                    <div class="tool-icon">📝</div>
+                    <h3>Captions Manager</h3>
+                    <p>Access all your Threads captions - flirty, engagement, and Telegram CTAs in one place</p>
+                </a>
+                
+                <!-- VA Manager -->
+                <a href="va-dashboard.html" class="tool-card">
+                    <div class="tool-icon">⏰</div>
+                    <h3>VA Manager</h3>
+                    <p>Complete timetable, warm-up tutorials, progress tracking, and daily schedule</p>
+                </a>
+                
+                <!-- Scheduler -->
+                <a href="threads-scheduler.html" class="tool-card">
+                    <div class="tool-icon">📅</div>
+                    <h3>Post Scheduler</h3>
+                    <p>Automate your posting schedule with reminders and caption rotation</p>
+                </a>
+                
+                <!-- Account Tracker -->
+                <a href="account-tracker.html" class="tool-card">
+                    <div class="tool-icon">👥</div>
+                    <h3>Account Tracker</h3>
+                    <p>Monitor all your accounts, views, and earnings across multiple agencies</p>
+                </a>
+                
+                <!-- Warm-up Guide -->
+                <a href="guide.html" class="tool-card">
+                    <div class="tool-icon">🔥</div>
+                    <h3>Warm-up Guide</h3>
+                    <p>Step-by-step account warm-up tutorial with checklists and timers</p>
+                </a>
+                
+                <!-- Earnings Calculator -->
+                <a href="earnings-calculator.html" class="tool-card">
+                    <div class="tool-icon">💰</div>
+                    <h3>Earnings Calculator</h3>
+                    <p>Calculate your potential earnings and track weekly targets</p>
+                </a>
+            </div>
+            
+            <!-- Quick URLs for Mobile -->
+            <div class="url-box">
+                <h3>📱 Mobile Access URLs</h3>
+                <p>Bookmark these on your phone:</p>
+                <input type="text" value="https://yourusername.github.io/va-tools/index.html" readonly onclick="this.select()">
+                <p style="font-size: 12px; margin-top: 5px;">Click to copy, then bookmark in your browser</p>
+            </div>
+            
+            <!-- Coming Soon -->
+            <div style="text-align: center; margin-top: 30px; padding: 20px; background: #FFFBEB; border-radius: 10px;">
+                <h3>🛠️ More Tools Coming Soon</h3>
+                <p style="color: #6B7280; margin-top: 10px;">
+                    Agency Manager • Performance Analytics • Content Calendar • Bulk Account Creator
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple copy functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input[readonly]');
+            inputs.forEach(input => {
+                input.addEventListener('click', function() {
+                    this.select();
+                    document.execCommand('copy');
+                    
+                    // Show temporary notification
+                    const originalBorder = this.style.borderColor;
+                    this.style.borderColor = '#10B981';
+                    this.style.transition = 'border-color 0.3s ease';
+                    
+                    setTimeout(() => {
+                        this.style.borderColor = originalBorder;
+                    }, 1000);
+                });
+            });
+        });
+        
+        // Add tooltips for better UX
+        const toolCards = document.querySelectorAll('.tool-card');
+        toolCards.forEach(card => {
+            card.title = 'Click to open ' + card.querySelector('h3').textContent;
+        });
+    </script>
+</body>
+</html>

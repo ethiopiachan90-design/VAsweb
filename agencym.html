@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agency Manager - Multi-Agency Tracking</title>
+    <style>
+        :root {
+            --primary: #8B5CF6;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --dark: #1F2937;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--dark);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: #F3F4F6;
+            border-bottom: 2px solid #E5E7EB;
+            flex-wrap: wrap;
+        }
+        
+        .nav-tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .nav-tab.active {
+            background: white;
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            padding: 30px;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        .grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        
+        .card {
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .agency-card {
+            border-left: 4px solid var(--primary);
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .agency-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        
+        .account-item {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+        
+        .status-suspended {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+        
+        .status-warmup {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #E5E7EB;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            transition: width 0.3s ease;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: center;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #6B7280;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .form-group {
+            margin: 15px 0;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #D1D5DB;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tab {
+                min-width: 100px;
+                font-size: 14px;
+                padding: 12px 10px;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏢 Agency Manager</h1>
+            <p>Manage Multiple Agencies & Track All Accounts</p>
+        </header>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button class="nav-tab" onclick="switchTab('agencies')">🏢 Agencies</button>
+            <button class="nav-tab" onclick="switchTab('accounts')">👥 Accounts</button>
+            <button class="nav-tab" onclick="switchTab('earnings')">💰 Earnings</button>
+            <button class="nav-tab" onclick="switchTab('reports')">📈 Reports</button>
+        </div>
+        
+        <div class="tab-content">
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-pane active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Agencies</h3>
+                        <div class="value" id="totalAgencies">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active Accounts</h3>
+                        <div class="value" id="activeAccounts">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Weekly Earnings</h3>
+                        <div class="value" id="weeklyEarnings">$0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Success Rate</h3>
+                        <div class="value" id="successRate">0%</div>
+                    </div>
+                </div>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>🚀 Quick Actions</h3>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+                            <button class="btn btn-primary" onclick="showAgencyForm()">+ Add Agency</button>
+                            <button class="btn btn-success" onclick="showAccountForm()">+ Add Account</button>
+                            <button class="btn btn-warning" onclick="generateReport()">📊 Generate Report</button>
+                            <button class="btn" onclick="checkAccountHealth()">🔍 Check Health</button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📅 Today's Priority</h3>
+                        <div id="todayPriority" style="margin-top: 15px;">
+                            <p>No urgent tasks today</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 20px;">
+                    <h3>📊 Agency Performance</h3>
+                    <div id="agencyPerformance">
+                        <p>No agency data yet. Add your first agency to see performance metrics.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Agencies Tab -->
+            <div id="agencies" class="tab-pane">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3>🏢 Your Agencies</h3>
+                        <button class="btn btn-primary" onclick="showAgencyForm()">+ Add New Agency</button>
+                    </div>
+                    <div id="agenciesList">
+                        <p>No agencies added yet. Add your first agency to get started!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Accounts Tab -->
+            <div id="accounts" class="tab-pane">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3>👥 All Accounts</h3>
+                        <button class="btn btn-primary" onclick="showAccountForm()">+ Add New Account</button>
+                    </div>
+                    <div id="accountsList">
+                        <p>No accounts added yet. Add your first account to get started!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Earnings Tab -->
+            <div id="earnings" class="tab-pane">
+                <div class="grid">
+                    <div class="card">
+                        <h3>💰 Earnings Overview</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h3>This Week</h3>
+                                <div class="value" id="thisWeekEarnings">$0</div>
+                            </div>
+                            <div class="stat-card">
+                                <h3>This Month</h3>
+                                <div class="value" id="thisMonthEarnings">$0</div>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Total</h3>
+                                <div class="value" id="totalEarnings">$0</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>🎯 Weekly Target Progress</h3>
+                        <div style="margin-top: 20px;">
+                            <p>Target: $<span id="weeklyTarget">300</span></p>
+                            <div class="progress-bar">
+                                <div id="targetProgress" class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <p>Current: $<span id="currentEarnings">0</span> / $<span id="targetAmount">300</span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 20px;">
+                    <h3>📈 Earnings by Agency</h3>
+                    <div id="earningsByAgency">
+                        <p>No earnings data yet. Start tracking your accounts to see earnings breakdown.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reports Tab -->
+            <div id="reports" class="tab-pane">
+                <div class="card">
+                    <h3>📊 Weekly Report Generator</h3>
+                    <div class="form-group">
+                        <label>Report Period:</label>
+                        <select id="reportPeriod">
+                            <option value="this_week">This Week</option>
+                            <option value="last_week">Last Week</option>
+                            <option value="this_month">This Month</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="generateWeeklyReport()">📋 Generate Weekly Report</button>
+                    
+                    <div id="reportOutput" style="margin-top: 20px; padding: 20px; background: #F8FAFC; border-radius: 8px; display: none;">
+                        <h4>📊 Weekly Report</h4>
+                        <div id="reportContent"></div>
+                        <button class="btn btn-success" onclick="copyReport()" style="margin-top: 15px;">📋 Copy Report</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agency Form Modal -->
+    <div id="agencyModal" class="modal">
+        <div class="modal-content">
+            <h3>Add New Agency</h3>
+            <div class="form-group">
+                <label>Agency Name:</label>
+                <input type="text" id="agencyName" placeholder="e.g., Threads Pro Agency">
+            </div>
+            <div class="form-group">
+                <label>Contact Person:</label>
+                <input type="text" id="agencyContact" placeholder="Telegram username or email">
+            </div>
+            <div class="form-group">
+                <label>Payment Rate ($ per 1K views):</label>
+                <input type="number" id="paymentRate" value="5" step="0.01" min="1">
+            </div>
+            <div class="form-group">
+                <label>Payment Schedule:</label>
+                <select id="paymentSchedule">
+                    <option value="weekly">Weekly</option>
+                    <option value="bi-weekly">Bi-Weekly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Notes:</label>
+                <textarea id="agencyNotes" rows="3" placeholder="Any special instructions..."></textarea>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-primary" onclick="saveAgency()">💾 Save Agency</button>
+                <button class="btn" style="background: #6B7280; color: white;" onclick="hideModal('agencyModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Form Modal -->
+    <div id="accountModal" class="modal">
+        <div class="modal-content">
+            <h3>Add New Account</h3>
+            <div class="form-group">
+                <label>Select Agency:</label>
+                <select id="accountAgency">
+                    <option value="">-- Select Agency --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Account Username:</label>
+                <input type="text" id="accountUsername" placeholder="e.g., @tiny_rae">
+            </div>
+            <div class="form-group">
+                <label>Posting Method:</label>
+                <select id="accountMethod">
+                    <option value="spam">SPAM Method</option>
+                    <option value="3text1pic">3Text-1Pic Method</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Status:</label>
+                <select id="accountStatus">
+                    <option value="active">Active</option>
+                    <option value="warmup">Warm-up</option>
+                    <option value="suspended">Suspended</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Current Views:</label>
+                <input type="number" id="accountViews" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>Creation Date:</label>
+                <input type="date" id="accountCreated" value="<?php echo date('Y-m-d'); ?>">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-primary" onclick="saveAccount()">💾 Save Account</button>
+                <button class="btn" style="background: #6B7280; color: white;" onclick="hideModal('accountModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Agency Manager Class
+        class AgencyManager {
+            constructor() {
+                this.agencies = JSON.parse(localStorage.getItem('va_agencies')) || [];
+                this.accounts = JSON.parse(localStorage.getItem('va_accounts')) || [];
+                this.earnings = JSON.parse(localStorage.getItem('va_earnings')) || [];
+                this.init();
+            }
+
+            init() {
+                this.updateDashboard();
+                this.renderAgencies();
+                this.renderAccounts();
+                this.updateEarnings();
+                this.populateAgencySelect();
+            }
+
+            updateDashboard() {
+                // Update stats
+                document.getElementById('totalAgencies').textContent = this.agencies.length;
+                
+                const activeAccounts = this.accounts.filter(acc => acc.status === 'active').length;
+                document.getElementById('activeAccounts').textContent = activeAccounts;
+                
+                const weeklyEarnings = this.getWeeklyEarnings();
+                document.getElementById('weeklyEarnings').textContent = '$' + weeklyEarnings;
+                
+                const totalAccounts = this.accounts.length;
+                const successRate = totalAccounts > 0 ? Math.round((activeAccounts / totalAccounts) * 100) : 0;
+                document.getElementById('successRate').textContent = successRate + '%';
+                
+                this.updateTodayPriority();
+                this.renderAgencyPerformance();
+            }
+
+            getWeeklyEarnings() {
+                const oneWeekAgo = new Date();
+                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                
+                return this.earnings
+                    .filter(earning => new Date(earning.date) >= oneWeekAgo)
+                    .reduce((total, earning) => total + earning.amount, 0);
+            }
+
+            updateTodayPriority() {
+                const container = document.getElementById('todayPriority');
+                const priorities = [];
+                
+                // Check for accounts needing warm-up
+                const warmupAccounts = this.accounts.filter(acc => acc.status === 'warmup');
+                if (warmupAccounts.length > 0) {
+                    priorities.push(`🔥 ${warmupAccounts.length} accounts need warm-up`);
+                }
+                
+                // Check for suspended accounts
+                const suspendedAccounts = this.accounts.filter(acc => acc.status === 'suspended');
+                if (suspendedAccounts.length > 0) {
+                    priorities.push(`🚨 ${suspendedAccounts.length} accounts suspended`);
+                }
+                
+                // Check earnings target
+                const weeklyEarnings = this.getWeeklyEarnings();
+                if (weeklyEarnings < 50) {
+                    priorities.push(`💰 Low earnings - need to post more`);
+                }
+                
+                if (priorities.length === 0) {
+                    container.innerHTML = '<p>✅ All systems normal. Keep up the good work!</p>';
+                } else {
+                    container.innerHTML = priorities.map(p => `<p>${p}</p>`).join('');
+                }
+            }
+
+            renderAgencyPerformance() {
+                const container = document.getElementById('agencyPerformance');
+                
+                if (this.agencies.length === 0) {
+                    container.innerHTML = '<p>No agency data yet.</p>';
+                    return;
+                }
+
+                container.innerHTML = this.agencies.map(agency => {
+                    const agencyAccounts = this.accounts.filter(acc => acc.agencyId === agency.id);
+                    const activeAccounts = agencyAccounts.filter(acc => acc.status === 'active').length;
+                    const totalAccounts = agencyAccounts.length;
+                    const successRate = totalAccounts > 0 ? Math.round((activeAccounts / totalAccounts) * 100) : 0;
+                    
+                    return `
+                        <div class="agency-card" style="padding: 15px; margin: 10px 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h4>${agency.name}</h4>
+                                    <p style="color: #6B7280; font-size: 14px;">Rate: $${agency.paymentRate}/1K views • ${agencyAccounts.length} accounts</p>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div class="status-badge status-active">${successRate}% Success</div>
+                                    <div style="font-size: 12px; color: #6B7280; margin-top: 5px;">${activeAccounts}/${totalAccounts} active</div>
+                                </div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${successRate}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            renderAgencies() {
+                const container = document.getElementById('agenciesList');
+                
+                if (this.agencies.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #6B7280;">
+                            <h3>No agencies yet</h3>
+                            <p>Add your first agency to start tracking</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = this.agencies.map(agency => {
+                    const agencyAccounts = this.accounts.filter(acc => acc.agencyId === agency.id);
+                    const activeAccounts = agencyAccounts.filter(acc => acc.status === 'active').length;
+                    
+                    return `
+                        <div class="agency-card">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h4>${agency.name}</h4>
+                                    <p style="color: #6B7280; font-size: 14px;">
+                                        Contact: ${agency.contact} • Rate: $${agency.paymentRate}/1K
+                                    </p>
+                                    <p style="font-size: 12px; color: #6B7280;">
+                                        ${agencyAccounts.length} total accounts • ${activeAccounts} active
+                                    </p>
+                                </div>
+                                <div>
+                                    <button class="btn" onclick="editAgency('${agency.id}')">Edit</button>
+                                    <button class="btn btn-danger" onclick="deleteAgency('${agency.id}')">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            renderAccounts() {
+                const container = document.getElementById('accountsList');
+                
+                if (this.accounts.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #6B7280;">
+                            <h3>No accounts yet</h3>
+                            <p>Add your first account to start tracking</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = this.accounts.map(account => {
+                    const agency = this.agencies.find(ag => ag.id === account.agencyId);
+                    const agencyName = agency ? agency.name : 'Unknown Agency';
+                    const statusClass = `status-${account.status}`;
+                    
+                    return `
+                        <div class="account-item">
+                            <div>
+                                <strong>${account.username}</strong>
+                                <div style="font-size: 12px; color: #6B7280;">
+                                    ${agencyName} • ${account.method} • ${account.views} views
+                                </div>
+                            </div>
+                            <div>
+                                <span class="status-badge ${statusClass}">${account.status}</span>
+                                <button class="btn" onclick="editAccount('${account.id}')" style="margin-left: 10px;">Edit</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            populateAgencySelect() {
+                const select = document.getElementById('accountAgency');
+                select.innerHTML = '<option value="">-- Select Agency --</option>';
+                
+                this.agencies.forEach(agency => {
+                    const option = document.createElement('option');
+                    option.value = agency.id;
+                    option.textContent = agency.name;
+                    select.appendChild(option);
+                });
+            }
+
+            addAgency(agencyData) {
+                const newAgency = {
+                    id: Date.now().toString(),
+                    ...agencyData,
+                    createdAt: new Date().toISOString()
+                };
+                
+                this.agencies.push(newAgency);
+                this.saveData();
+                this.updateDashboard();
+                this.renderAgencies();
+                this.populateAgencySelect();
+            }
+
+            addAccount(accountData) {
+                const newAccount = {
+                    id: Date.now().toString(),
+                    ...accountData,
+                    createdAt: new Date().toISOString()
+                };
+                
+                this.accounts.push(newAccount);
+                this.saveData();
+                this.updateDashboard();
+                this.renderAccounts();
+            }
+
+            updateEarnings() {
+                const weeklyEarnings = this.getWeeklyEarnings();
+                const monthlyEarnings = this.getMonthlyEarnings();
+                const totalEarnings = this.earnings.reduce((sum, earning) => sum + earning.amount, 0);
+                
+                document.getElementById('thisWeekEarnings').textContent = '$' + weeklyEarnings;
+                document.getElementById('thisMonthEarnings').textContent = '$' + monthlyEarnings;
+                document.getElementById('totalEarnings').textContent = '$' + totalEarnings;
+                
+                // Update target progress
+                const target = 300; // $300 weekly target
+                const progress = Math.min((weeklyEarnings / target) * 100, 100);
+                document.getElementById('targetProgress').style.width = progress + '%';
+                document.getElementById('currentEarnings').textContent = weeklyEarnings;
+                document.getElementById('targetAmount').textContent = target;
+                
+                this.renderEarningsByAgency();
+            }
+
+            getMonthlyEarnings() {
+                const oneMonthAgo = new Date();
+                oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+                
+                return this.earnings
+                    .filter(earning => new Date(earning.date) >= oneMonthAgo)
+                    .reduce((total, earning) => total + earning.amount, 0);
+            }
+
+            renderEarningsByAgency() {
+                const container = document.getElementById('earningsByAgency');
+                
+                if (this.agencies.length === 0) {
+                    container.innerHTML = '<p>No agency data yet.</p>';
+                    return;
+                }
+
+                const agencyEarnings = this.agencies.map(agency => {
+                    const agencyAccounts = this.accounts.filter(acc => acc.agencyId === agency.id);
+                    const totalViews = agencyAccounts.reduce((sum, acc) => sum + (acc.views || 0), 0);
+                    const earnings = (totalViews / 1000) * agency.paymentRate;
+                    
+                    return { agency, earnings, accounts: agencyAccounts.length };
+                });
+
+                container.innerHTML = agencyEarnings.map(item => `
+                    <div class="account-item">
+                        <div>
+                            <strong>${item.agency.name}</strong>
+                            <div style="font-size: 12px; color: #6B7280;">
+                                ${item.accounts} accounts • $${item.agency.paymentRate}/1K rate
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: bold; color: var(--success);">$${item.earnings.toFixed(2)}</div>
+                            <div style="font-size: 11px; color: #6B7280;">potential</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            generateWeeklyReport() {
+                const weeklyEarnings = this.getWeeklyEarnings();
+                const activeAccounts = this.accounts.filter(acc => acc.status === 'active').length;
+                const totalAccounts = this.accounts.length;
+                const suspendedAccounts = this.accounts.filter(acc => acc.status === 'suspended').length;
+                
+                const report = `
+WEEKLY VA REPORT - ${new Date().toLocaleDateString()}
+
+📊 OVERVIEW:
+• Total Agencies: ${this.agencies.length}
+• Active Accounts: ${activeAccounts}/${totalAccounts}
+• Suspended Accounts: ${suspendedAccounts}
+• Weekly Earnings: $${weeklyEarnings}
+
+🏢 AGENCY BREAKDOWN:
+${this.agencies.map(agency => {
+    const agencyAccounts = this.accounts.filter(acc => acc.agencyId === agency.id);
+    const active = agencyAccounts.filter(acc => acc.status === 'active').length;
+    return `• ${agency.name}: ${active}/${agencyAccounts.length} active accounts`;
+}).join('\n')}
+
+🎯 RECOMMENDATIONS:
+${suspendedAccounts > 0 ? `• Appeal ${suspendedAccounts} suspended accounts` : '• All accounts healthy'}
+${weeklyEarnings < 100 ? `• Increase posting frequency to reach $100 weekly target` : '• Maintain current performance'}
+${activeAccounts < 5 ? `• Create more accounts to scale earnings` : '• Good account count'}
+
+Next Steps: Continue consistent posting and account maintenance.
+                `.trim();
+
+                document.getElementById('reportContent').textContent = report;
+                document.getElementById('reportOutput').style.display = 'block';
+            }
+
+            saveData() {
+                localStorage.setItem('va_agencies', JSON.stringify(this.agencies));
+                localStorage.setItem('va_accounts', JSON.stringify(this.accounts));
+                localStorage.setItem('va_earnings', JSON.stringify(this.earnings));
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.style.background = type === 'success' ? '#10B981' : type === 'warning' ? '#F59E0B' : '#EF4444';
+                notification.style.display = 'block';
+                
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Global functions
+        let agencyManager;
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-pane').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(button => button.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Refresh data when switching to earnings tab
+            if (tabName === 'earnings') {
+                agencyManager.updateEarnings();
+            }
+        }
+
+        function showAgencyForm() {
+            document.getElementById('agencyModal').style.display = 'flex';
+        }
+
+        function showAccountForm() {
+            if (agencyManager.agencies.length === 0) {
+                alert('Please add an agency first!');
+                switchTab('agencies');
+                showAgencyForm();
+                return;
+            }
+            document.getElementById('accountModal').style.display = 'flex';
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function saveAgency() {
+            const name = document.getElementById('agencyName').value;
+            const contact = document.getElementById('agencyContact').value;
+            const paymentRate = parseFloat(document.getElementById('paymentRate').value);
+            const paymentSchedule = document.getElementById('paymentSchedule').value;
+            const notes = document.getElementById('agencyNotes').value;
+            
+            if (!name || !contact) {
+                agencyManager.showNotification('Please fill all required fields', 'danger');
+                return;
+            }
+            
+            agencyManager.addAgency({
+                name,
+                contact,
+                paymentRate,
+                paymentSchedule,
+                notes
+            });
+            
+            hideModal('agencyModal');
+            
+            // Clear form
+            document.getElementById('agencyName').value = '';
+            document.getElementById('agencyContact').value = '';
+            document.getElementById('agencyNotes').value = '';
+            
+            agencyManager.showNotification('Agency added successfully! 🏢', 'success');
+        }
+
+        function saveAccount() {
+            const agencyId = document.getElementById('accountAgency').value;
+            const username = document.getElementById('accountUsername').value;
+            const method = document.getElementById('accountMethod').value;
+            const status = document.getElementById('accountStatus').value;
+            const views = parseInt(document.getElementById('accountViews').value) || 0;
+            const created = document.getElementById('accountCreated').value;
+            
+            if (!agencyId || !username) {
+                agencyManager.showNotification('Please fill all required fields', 'danger');
+                return;
+            }
+            
+            agencyManager.addAccount({
+                agencyId,
+                username,
+                method,
+                status,
+                views,
+                created
+            });
+            
+            hideModal('accountModal');
+            
+            // Clear form
+            document.getElementById('accountUsername').value = '';
+            document.getElementById('accountViews').value = '0';
+            
+            agencyManager.showNotification('Account added successfully! 👥', 'success');
+        }
+
+        function generateReport() {
+            switchTab('reports');
+            agencyManager.generateWeeklyReport();
+        }
+
+        function generateWeeklyReport() {
+            agencyManager.generateWeeklyReport();
+        }
+
+        function copyReport() {
+            const reportContent = document.getElementById('reportContent').textContent;
+            navigator.clipboard.writeText(reportContent).then(() => {
+                agencyManager.showNotification('Report copied to clipboard! 📋', 'success');
+            });
+        }
+
+        function checkAccountHealth() {
+            const suspendedAccounts = agencyManager.accounts.filter(acc => acc.status === 'suspended').length;
+            const warmupAccounts = agencyManager.accounts.filter(acc => acc.status === 'warmup').length;
+            
+            if (suspendedAccounts > 0 || warmupAccounts > 0) {
+                agencyManager.showNotification(`Found ${suspendedAccounts} suspended and ${warmupAccounts} warm-up accounts`, 'warning');
+            } else {
+                agencyManager.showNotification('All accounts are healthy! ✅', 'success');
+            }
+        }
+
+        function editAgency(agencyId) {
+            // Implementation for editing agency
+            alert('Edit agency feature coming soon!');
+        }
+
+        function deleteAgency(agencyId) {
+            if (confirm('Are you sure you want to delete this agency? This will also delete all associated accounts.')) {
+                agencyManager.agencies = agencyManager.agencies.filter(ag => ag.id !== agencyId);
+                agencyManager.accounts = agencyManager.accounts.filter(acc => acc.agencyId !== agencyId);
+                agencyManager.saveData();
+                agencyManager.updateDashboard();
+                agencyManager.renderAgencies();
+                agencyManager.renderAccounts();
+                agencyManager.populateAgencySelect();
+                agencyManager.showNotification('Agency deleted successfully', 'success');
+            }
+        }
+
+        function editAccount(accountId) {
+            // Implementation for editing account
+            alert('Edit account feature coming soon!');
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            agencyManager = new AgencyManager();
+        });
+
+        // Modal background click to close
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro VA Manager - Complete System</title>
+    <style>
+        :root {
+            --primary: #8B5CF6;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --dark: #1F2937;
+            --school: #3B82F6;
+            --va: #8B5CF6;
+            --break: #F59E0B;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--dark);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: #F3F4F6;
+            border-bottom: 2px solid #E5E7EB;
+            flex-wrap: wrap;
+        }
+        
+        .nav-tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .nav-tab.active {
+            background: white;
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            padding: 30px;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        .grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        
+        .card {
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-school {
+            background: var(--school);
+            color: white;
+        }
+        
+        .btn-va {
+            background: var(--va);
+            color: white;
+        }
+        
+        .btn-break {
+            background: var(--break);
+            color: white;
+        }
+        
+        .timetable {
+            display: grid;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .time-slot {
+            display: grid;
+            grid-template-columns: 100px 1fr 100px;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            align-items: center;
+        }
+        
+        .time-slot.school {
+            background: #EFF6FF;
+            border-left: 4px solid var(--school);
+        }
+        
+        .time-slot.va {
+            background: #F5F3FF;
+            border-left: 4px solid var(--va);
+        }
+        
+        .time-slot.break {
+            background: #FFFBEB;
+            border-left: 4px solid var(--break);
+        }
+        
+        .time-slot.sleep {
+            background: #F3F4F6;
+            border-left: 4px solid #6B7280;
+        }
+        
+        .time {
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .activity {
+            font-weight: 600;
+        }
+        
+        .duration {
+            color: #6B7280;
+            font-size: 14px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #E5E7EB;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            transition: width 0.3s ease;
+        }
+        
+        .warmup-step {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .step-number {
+            background: var(--primary);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-time {
+            background: var(--warning);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: center;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #6B7280;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tab {
+                min-width: 100px;
+                font-size: 14px;
+                padding: 12px 10px;
+            }
+            
+            .time-slot {
+                grid-template-columns: 80px 1fr;
+                gap: 10px;
+            }
+            
+            .duration {
+                grid-column: 1 / -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎓 Student VA Pro Manager</h1>
+            <p>Balancing School & VA Work for Maximum Earnings</p>
+        </header>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button class="nav-tab" onclick="switchTab('timetable')">⏰ Daily Timetable</button>
+            <button class="nav-tab" onclick="switchTab('warmup')">🔥 Account Warm-up</button>
+            <button class="nav-tab" onclick="switchTab('progress')">📈 Progress Tracking</button>
+            <button class="nav-tab" onclick="switchTab('tools')">🛠️ Quick Tools</button>
+        </div>
+        
+        <div class="tab-content">
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-pane active">
+                <div class="grid">
+                    <div class="card">
+                        <h3>🎯 Today's Overview</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h3>Active Accounts</h3>
+                                <div class="value" id="activeAccounts">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Today's Posts</h3>
+                                <div class="value" id="todayPosts">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Weekly Earnings</h3>
+                                <div class="value" id="weeklyEarnings">$0</div>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Target Progress</h3>
+                                <div class="value" id="targetProgress">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📅 Current Session</h3>
+                        <div id="currentSession">
+                            <p>Loading current activity...</p>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="sessionProgress" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <div id="nextSession" style="margin-top: 15px; padding: 10px; background: #F3F4F6; border-radius: 6px;">
+                            <strong>Next:</strong> <span id="nextActivity">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 20px;">
+                    <h3>🚀 Quick Actions</h3>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-va" onclick="startWarmup()">🔥 Start Warm-up</button>
+                        <button class="btn btn-primary" onclick="showPostingSchedule()">📅 Posting Schedule</button>
+                        <button class="btn btn-success" onclick="logProgress()">📊 Log Progress</button>
+                        <button class="btn btn-school" onclick="showSchoolMode()">🎓 School Mode</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Timetable Tab -->
+            <div id="timetable" class="tab-pane">
+                <div class="card">
+                    <h3>⏰ Your Daily Timetable (East Africa Time)</h3>
+                    <p style="color: #6B7280; margin-bottom: 20px;">Optimized around your school schedule for maximum earnings</p>
+                    
+                    <div class="timetable">
+                        <!-- Early Morning -->
+                        <div class="time-slot va">
+                            <div class="time">6:00 AM</div>
+                            <div class="activity">
+                                <span class="btn-va" style="padding: 2px 8px; border-radius: 4px; font-size: 12px;">VA WORK</span>
+                                Quick Morning Session
+                            </div>
+                            <div class="duration">45 minutes</div>
+                        </div>
+                        
+                        <!-- School Time -->
+                        <div class="time-slot school">
+                            <div class="time">6:50 AM</div>
+                            <div class="activity">
+                                <span class="btn-school" style="padding: 2px 8px; border-radius: 4px; font-size: 12px;">SCHOOL</span>
+                                Focus on Studies
+                            </div>
+                            <div class="duration">6 hours 40 minutes</div>
+                        </div>
+                        
+                        <!-- Lunch Break -->
+                        <div class="time-slot break">
+                            <div class="time">1:30 PM</div>
+                            <div class="activity">
+                                <span class="btn-break" style="padding: 2px 8px; border-radius: 4px; font-size: 12px;">BREAK</span>
+                                Lunch & Rest
+                            </div>
+                            <div class="duration">1 hour 10 minutes</div>
+                        </div>
+                        
+                        <!-- Afternoon VA Session -->
+                        <div class="time-slot va">
+                            <div class="time">2:40 PM</div>
+                            <div class="activity">
+                                <span class="btn-va" style="padding: 2px 8px; border-radius: 4px; font-size: 12px;">VA WORK</span>
+                                Account Creation & Warm-up
+                            </div>
+                            <div class="duration">1 hour 20 minutes</div>
+                        </div>
+                        
+                        <div class="time-slot va">
+                            <div class="time">4:00 PM</div>
+                            <div class="activity">
+                                <span class="btn-va" style="padding: 2px 8px; border-radius: 4px; font-size: 12px;">VA WORK</span>
+                                Active Posting & Management
+                            </div>
+                            <div class="duration">2 hours</div>
+                        </div>
+                        
+                        <!-- Evening Break -->
+                        <div class="time-slot break">
+                            <div class="time">6:00 PM</div>
+                            <div class="activity">
+                                <span class="btn-break" style="padding: 2px 8px; border-radius: 4px; font-size: 12px;">BREAK</span>
+                                Dinner & Personal Time
+                            </div>
+                            <div class="duration">2 hours</div>
+                        </div>
+                        
+                        <!-- Evening VA Session -->
+                        <div class="time-slot va">
+                            <div class="time">8:00 PM</div>
+                            <div class="activity">
+                                <span class="btn-va" style="padding: 2px 8px; border-radius: 4px; font-size: 12px;">VA WORK</span>
+                                Peak Posting Hours
+                            </div>
+                            <div class="duration">2 hours</div>
+                        </div>
+                        
+                        <div class="time-slot va">
+                            <div class="time">10:00 PM</div>
+                            <div class="activity">
+                                <span class="btn-va" style="padding: 2px 8px; border-radius: 4px; font-size: 12px;">VA WORK</span>
+                                Consistent Posting
+                            </div>
+                            <div class="duration">2 hours</div>
+                        </div>
+                        
+                        <!-- Wind Down -->
+                        <div class="time-slot va">
+                            <div class="time">12:00 AM</div>
+                            <div class="activity">
+                                <span class="btn-va" style="padding: 2px 8px; border-radius: 4px; font-size: 12px;">VA WORK</span>
+                                Final Posts & Analytics
+                            </div>
+                            <div class="duration">1 hour</div>
+                        </div>
+                        
+                        <!-- Sleep -->
+                        <div class="time-slot sleep">
+                            <div class="time">1:00 AM</div>
+                            <div class="activity">💤 Sleep & Recovery</div>
+                            <div class="duration">5 hours</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid" style="margin-top: 20px;">
+                    <div class="card">
+                        <h3>🎯 Daily Targets</h3>
+                        <div style="margin-top: 15px;">
+                            <p>✅ Create 1-2 new accounts</p>
+                            <p>✅ Complete warm-up for new accounts</p>
+                            <p>✅ Post to 6+ active accounts</p>
+                            <p>✅ 30+ posts daily</p>
+                            <p>✅ 6,000+ views target</p>
+                            <p>✅ $30+ daily earnings</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📊 Earnings Projection</h3>
+                        <div style="margin-top: 15px;">
+                            <p><strong>Weekdays:</strong> $30-35 daily</p>
+                            <p><strong>Weekends:</strong> $60-70 daily</p>
+                            <p><strong>Weekly Total:</strong> $270-300</p>
+                            <p><strong>Monthly Total:</strong> $1,080-1,200</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Warm-up Tutorial Tab -->
+            <div id="warmup" class="tab-pane">
+                <div class="card">
+                    <h3>🔥 Complete Account Warm-up Tutorial</h3>
+                    <p style="color: #6B7280; margin-bottom: 20px;">Step-by-step guide to properly warm up new Threads accounts</p>
+                    
+                    <div class="warmup-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <strong>Account Creation (10 minutes)</strong>
+                            <p>Create Instagram account with model name + emojis, adult DOB, Outlook email, no bio</p>
+                        </div>
+                        <div class="step-time">10 mins</div>
+                    </div>
+                    
+                    <div class="warmup-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <strong>Instagram Warm-up (30 minutes)</strong>
+                            <p>Follow 5 target accounts, watch 3-5 reels completely, scroll feed 5-10 minutes, like max 2 posts</p>
+                            <div style="font-size: 12px; color: #6B7280; margin-top: 5px;">
+                                Target: @realcamillaara, @julia.filippo, @alinnarosee, @sophieraiin, @avaxreyess
+                            </div>
+                        </div>
+                        <div class="step-time">30 mins</div>
+                    </div>
+                    
+                    <div class="warmup-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <strong>Threads Profile Setup (5 minutes)</strong>
+                            <p>Import Instagram profile, check emojis show correctly, turn off IG badge</p>
+                        </div>
+                        <div class="step-time">5 mins</div>
+                    </div>
+                    
+                    <div class="warmup-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <strong>Threads Warm-up (45 minutes)</strong>
+                            <p>Follow 6 target accounts, like 2 spaced posts before following, follow 1-2 USA men, drop outreach comments</p>
+                            <div style="font-size: 12px; color: #6B7280; margin-top: 5px;">
+                                Target: @maeve.duval, @8us.ruby, @kristyirwin46, @mollyduvalxo, @sienna.rishette, @lia_finx
+                            </div>
+                        </div>
+                        <div class="step-time">45 mins</div>
+                    </div>
+                    
+                    <div class="warmup-step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <strong>Initial Posting (15 minutes)</strong>
+                            <p>Post "Hi threads, I'm [Name] ❤️" and pin immediately. Wait 5 minutes, then post 3 more captions</p>
+                        </div>
+                        <div class="step-time">15 mins</div>
+                    </div>
+                    
+                    <div class="warmup-step">
+                        <div class="step-number">6</div>
+                        <div class="step-content">
+                            <strong>Link Setup (After 1 hour)</strong>
+                            <p>Quote mother page posts with CTA captions, pin to profile, activate Fediverse</p>
+                        </div>
+                        <div class="step-time">10 mins</div>
+                    </div>
+                </div>
+                
+                <div class="grid" style="margin-top: 20px;">
+                    <div class="card">
+                        <h3>📝 Warm-up Checklist</h3>
+                        <div id="warmupChecklist" style="margin-top: 15px;">
+                            <label><input type="checkbox" onchange="updateWarmupProgress()"> Account created with correct details</label><br>
+                            <label><input type="checkbox" onchange="updateWarmupProgress()"> Instagram warm-up completed</label><br>
+                            <label><input type="checkbox" onchange="updateWarmupProgress()"> Threads profile imported</label><br>
+                            <label><input type="checkbox" onchange="updateWarmupProgress()"> Threads warm-up completed</label><br>
+                            <label><input type="checkbox" onchange="updateWarmupProgress()"> First posts published</label><br>
+                            <label><input type="checkbox" onchange="updateWarmupProgress()"> Link post added after 1 hour</label><br>
+                            <label><input type="checkbox" onchange="updateWarmupProgress()"> Fediverse activated</label><br>
+                            <label><input type="checkbox" onchange="updateWarmupProgress()"> Added to active pages</label>
+                        </div>
+                        <div class="progress-bar" style="margin-top: 15px;">
+                            <div id="warmupProgress" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <p>Progress: <span id="warmupPercent">0%</span> complete</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>⚡ Quick Warm-up Tools</h3>
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-primary" onclick="startGuidedWarmup()">🎮 Start Guided Warm-up</button>
+                            <button class="btn btn-success" onclick="copyTargetAccounts()">📋 Copy Target Accounts</button>
+                            <button class="btn" onclick="resetWarmupChecklist()">🔄 Reset Checklist</button>
+                        </div>
+                        <div style="margin-top: 15px; font-size: 12px; color: #6B7280;">
+                            <p><strong>Total Warm-up Time:</strong> ~1.5 hours per account</p>
+                            <p><strong>Best Time:</strong> Afternoon or Evening sessions</p>
+                            <p><strong>Daily Goal:</strong> 1-2 new accounts</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Progress Tracking Tab -->
+            <div id="progress" class="tab-pane">
+                <div class="card">
+                    <h3>📈 Weekly Progress Tracker</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Accounts Created</h3>
+                            <div class="value" id="accountsCreated">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Total Posts</h3>
+                            <div class="value" id="totalPosts">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Total Views</h3>
+                            <div class="value" id="totalViews">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Total Earnings</h3>
+                            <div class="value" id="totalEarnings">$0</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 20px;">
+                    <h3>📊 Daily Log</h3>
+                    <div class="form-group">
+                        <label>Date:</label>
+                        <input type="date" id="logDate" value="<?php echo date('Y-m-d'); ?>">
+                    </div>
+                    <div class="form-group">
+                        <label>Accounts Worked On:</label>
+                        <input type="number" id="accountsWorked" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Posts Made:</label>
+                        <input type="number" id="postsMade" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Views Gained:</label>
+                        <input type="number" id="viewsGained" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Earnings ($):</label>
+                        <input type="number" id="dailyEarnings" min="0" step="0.01" value="0">
+                    </div>
+                    <button class="btn btn-success" onclick="saveDailyLog()">💾 Save Daily Log</button>
+                </div>
+            </div>
+            
+            <!-- Tools Tab -->
+            <div id="tools" class="tab-pane">
+                <div class="grid">
+                    <div class="card">
+                        <h3>⏰ Session Timer</h3>
+                        <div style="text-align: center; margin: 20px 0;">
+                            <div id="timerDisplay" style="font-size: 48px; font-weight: bold; color: var(--primary);">45:00</div>
+                            <div style="margin-top: 15px;">
+                                <button class="btn btn-primary" onclick="startTimer(45)">45 min VA</button>
+                                <button class="btn btn-school" onclick="startTimer(30)">30 min School</button>
+                                <button class="btn btn-break" onclick="startTimer(15)">15 min Break</button>
+                                <button class="btn" onclick="stopTimer()">⏹ Stop</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>🎯 Earnings Calculator</h3>
+                        <div class="form-group">
+                            <label>Total Views:</label>
+                            <input type="number" id="calcViews" min="0" value="0" oninput="calculateEarnings()">
+                        </div>
+                        <div class="form-group">
+                            <label>Rate per 1K views:</label>
+                            <input type="number" id="calcRate" min="0" step="0.01" value="5" oninput="calculateEarnings()">
+                        </div>
+                        <div class="stat-card" style="margin-top: 15px;">
+                            <h3>Estimated Earnings</h3>
+                            <div class="value" id="calculatedEarnings">$0.00</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 20px;">
+                    <h3>📋 Quick Reference</h3>
+                    <div class="grid">
+                        <div>
+                            <h4>Target Accounts</h4>
+                            <div style="font-size: 12px;">
+                                <p><strong>Instagram:</strong> @realcamillaara, @julia.filippo, @alinnarosee, @sophieraiin, @avaxreyess</p>
+                                <p><strong>Threads:</strong> @maeve.duval, @8us.ruby, @kristyirwin46, @mollyduvalxo, @sienna.rishette, @lia_finx</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h4>Mother Pages</h4>
+                            <div style="font-size: 12px;">
+                                <p>@sashaaxxcute</p>
+                                <p>@sexxysashalove</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Student VA Manager Class
+        class StudentVAManager {
+            constructor() {
+                this.accounts = JSON.parse(localStorage.getItem('student_va_accounts')) || [];
+                this.dailyLogs = JSON.parse(localStorage.getItem('student_va_logs')) || [];
+                this.settings = JSON.parse(localStorage.getItem('student_va_settings')) || {
+                    weeklyTarget: 300,
+                    dailyAccountGoal: 2
+                };
+                this.timer = null;
+                this.currentTime = 0;
+                this.init();
+            }
+
+            init() {
+                this.updateDashboard();
+                this.updateCurrentSession();
+                this.setupRealTimeUpdates();
+            }
+
+            updateDashboard() {
+                const weeklyEarnings = this.getWeeklyEarnings();
+                const activeAccounts = this.accounts.filter(acc => acc.status === 'active').length;
+                const todayPosts = this.getTodayPosts();
+                
+                document.getElementById('activeAccounts').textContent = activeAccounts;
+                document.getElementById('todayPosts').textContent = todayPosts;
+                document.getElementById('weeklyEarnings').textContent = '$' + weeklyEarnings;
+                
+                const targetProgress = Math.min((weeklyEarnings / this.settings.weeklyTarget) * 100, 100);
+                document.getElementById('targetProgress').textContent = Math.round(targetProgress) + '%';
+            }
+
+            getWeeklyEarnings() {
+                const oneWeekAgo = new Date();
+                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                
+                return this.dailyLogs
+                    .filter(log => new Date(log.date) >= oneWeekAgo)
+                    .reduce((total, log) => total + (log.earnings || 0), 0);
+            }
+
+            getTodayPosts() {
+                const today = new Date().toDateString();
+                return this.accounts.reduce((total, acc) => {
+                    return total + (acc.posts || []).filter(post => 
+                        new Date(post.time).toDateString() === today).length;
+                }, 0);
+            }
+
+            updateCurrentSession() {
+                const now = new Date();
+                const currentHour = now.getHours();
+                const currentMinute = now.getMinutes();
+                
+                let currentActivity = '';
+                let nextActivity = '';
+                let progress = 0;
+                
+                // Determine current session based on time
+                if (currentHour >= 6 && currentHour < 6 || (currentHour === 6 && currentMinute < 50)) {
+                    currentActivity = '🟣 VA Work: Quick Morning Session';
+                    nextActivity = '🎓 School: 6:50 AM';
+                    progress = ((currentHour - 6) * 60 + currentMinute) / 45 * 100;
+                } else if ((currentHour === 6 && currentMinute >= 50) || (currentHour > 6 && currentHour < 13) || (currentHour === 13 && currentMinute < 30)) {
+                    currentActivity = '🎓 School: Focus on Studies';
+                    nextActivity = '🍲 Lunch Break: 1:30 PM';
+                    const schoolStart = 6 * 60 + 50; // 6:50 in minutes
+                    const currentTime = currentHour * 60 + currentMinute;
+                    progress = ((currentTime - schoolStart) / (13 * 60 + 30 - schoolStart)) * 100;
+                } else if ((currentHour === 13 && currentMinute >= 30) || (currentHour === 14 && currentMinute < 40)) {
+                    currentActivity = '🍲 Lunch Break';
+                    nextActivity = '🟣 VA Work: 2:40 PM';
+                    progress = ((currentHour - 13) * 60 + (currentMinute - 30)) / 70 * 100;
+                } else if ((currentHour === 14 && currentMinute >= 40) || currentHour === 15 || (currentHour === 16 && currentMinute < 30)) {
+                    currentActivity = '🟣 VA Work: Account Creation & Warm-up';
+                    nextActivity = '🟣 VA Work: Active Posting (4:00 PM)';
+                    const sessionStart = 14 * 60 + 40;
+                    const currentTime = currentHour * 60 + currentMinute;
+                    progress = ((currentTime - sessionStart) / (16 * 60 + 30 - sessionStart)) * 100;
+                } else {
+                    currentActivity = 'Check timetable for current session';
+                    nextActivity = 'Next activity';
+                }
+                
+                document.getElementById('currentSession').innerHTML = `<strong>Current:</strong> ${currentActivity}`;
+                document.getElementById('nextActivity').textContent = nextActivity;
+                document.getElementById('sessionProgress').style.width = Math.min(progress, 100) + '%';
+            }
+
+            setupRealTimeUpdates() {
+                // Update current session every minute
+                setInterval(() => {
+                    this.updateCurrentSession();
+                }, 60000);
+                
+                // Update dashboard every 5 minutes
+                setInterval(() => {
+                    this.updateDashboard();
+                }, 300000);
+            }
+
+            startTimer(minutes) {
+                this.stopTimer(); // Clear any existing timer
+                
+                this.currentTime = minutes * 60;
+                this.updateTimerDisplay();
+                
+                this.timer = setInterval(() => {
+                    this.currentTime--;
+                    this.updateTimerDisplay();
+                    
+                    if (this.currentTime <= 0) {
+                        this.stopTimer();
+                        this.showNotification('Timer finished! ⏰', 'success');
+                    }
+                }, 1000);
+                
+                this.showNotification(`Timer started for ${minutes} minutes 🕒`, 'success');
+            }
+
+            stopTimer() {
+                if (this.timer) {
+                    clearInterval(this.timer);
+                    this.timer = null;
+                }
+            }
+
+            updateTimerDisplay() {
+                const minutes = Math.floor(this.currentTime / 60);
+                const seconds = this.currentTime % 60;
+                document.getElementById('timerDisplay').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            calculateEarnings() {
+                const views = parseInt(document.getElementById('calcViews').value) || 0;
+                const rate = parseFloat(document.getElementById('calcRate').value) || 5;
+                const earnings = (views / 1000) * rate;
+                document.getElementById('calculatedEarnings').textContent = '$' + earnings.toFixed(2);
+            }
+
+            saveDailyLog() {
+                const date = document.getElementById('logDate').value;
+                const accountsWorked = parseInt(document.getElementById('accountsWorked').value) || 0;
+                const postsMade = parseInt(document.getElementById('postsMade').value) || 0;
+                const viewsGained = parseInt(document.getElementById('viewsGained').value) || 0;
+                const earnings = parseFloat(document.getElementById('dailyEarnings').value) || 0;
+                
+                const existingLogIndex = this.dailyLogs.findIndex(log => log.date === date);
+                
+                if (existingLogIndex !== -1) {
+                    this.dailyLogs[existingLogIndex] = { date, accountsWorked, postsMade, viewsGained, earnings };
+                } else {
+                    this.dailyLogs.push({ date, accountsWorked, postsMade, viewsGained, earnings });
+                }
+                
+                localStorage.setItem('student_va_logs', JSON.stringify(this.dailyLogs));
+                this.showNotification('Daily log saved! 📊', 'success');
+                this.updateProgressTracking();
+            }
+
+            updateProgressTracking() {
+                const totalAccounts = this.dailyLogs.reduce((sum, log) => sum + log.accountsWorked, 0);
+                const totalPosts = this.dailyLogs.reduce((sum, log) => sum + log.postsMade, 0);
+                const totalViews = this.dailyLogs.reduce((sum, log) => sum + log.viewsGained, 0);
+                const totalEarnings = this.dailyLogs.reduce((sum, log) => sum + log.earnings, 0);
+                
+                document.getElementById('accountsCreated').textContent = totalAccounts;
+                document.getElementById('totalPosts').textContent = totalPosts;
+                document.getElementById('totalViews').textContent = totalViews.toLocaleString();
+                document.getElementById('totalEarnings').textContent = '$' + totalEarnings.toFixed(2);
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.style.background = type === 'success' ? '#10B981' : type === 'warning' ? '#F59E0B' : '#EF4444';
+                notification.style.display = 'block';
+                
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Warm-up Management
+        function updateWarmupProgress() {
+            const checkboxes = document.querySelectorAll('#warmupChecklist input[type="checkbox"]');
+            const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const total = checkboxes.length;
+            const progress = (checked / total) * 100;
+            
+            document.getElementById('warmupProgress').style.width = progress + '%';
+            document.getElementById('warmupPercent').textContent = Math.round(progress) + '%';
+        }
+
+        function startGuidedWarmup() {
+            alert('🚀 Starting guided warm-up! Follow the steps in order.');
+        }
+
+        function copyTargetAccounts() {
+            const accounts = `Instagram: @realcamillaara, @julia.filippo, @alinnarosee, @sophieraiin, @avaxreyess\nThreads: @maeve.duval, @8us.ruby, @kristyirwin46, @mollyduvalxo, @sienna.rishette, @lia_finx`;
+            navigator.clipboard.writeText(accounts);
+            alert('Target accounts copied to clipboard! 📋');
+        }
+
+        function resetWarmupChecklist() {
+            const checkboxes = document.querySelectorAll('#warmupChecklist input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            updateWarmupProgress();
+        }
+
+        // Global functions
+        let vaManager;
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-pane').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(button => button.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function startTimer(minutes) {
+            vaManager.startTimer(minutes);
+        }
+
+        function stopTimer() {
+            vaManager.stopTimer();
+        }
+
+        function calculateEarnings() {
+            vaManager.calculateEarnings();
+        }
+
+        function saveDailyLog() {
+            vaManager.saveDailyLog();
+        }
+
+        function startWarmup() {
+            switchTab('warmup');
+        }
+
+        function showPostingSchedule() {
+            // Implementation for posting schedule
+            alert('Posting schedule feature coming soon! 📅');
+        }
+
+        function logProgress() {
+            switchTab('progress');
+        }
+
+        function showSchoolMode() {
+            alert('🎓 School Mode Activated! Focus on studies until 1:30 PM.');
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            vaManager = new StudentVAManager();
+            vaManager.updateProgressTracking();
+        });
+    </script>
+</body>
+</html>

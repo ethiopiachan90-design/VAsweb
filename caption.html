@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threads Captions Manager - VA Tool</title>
+    <style>
+        :root {
+            --primary: #8B5CF6;
+            --secondary: #7C3AED;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --dark: #1F2937;
+            --light: #F3F4F6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--dark);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: #F3F4F6;
+            border-bottom: 2px solid #E5E7EB;
+            flex-wrap: wrap;
+        }
+        
+        .nav-tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .nav-tab.active {
+            background: white;
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            padding: 30px;
+            min-height: 600px;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        .grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+        
+        .card {
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-copy {
+            background: var(--primary);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        .caption-item {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .caption-item:hover {
+            background: #F0F4F8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .caption-text {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .category-badge {
+            background: var(--primary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid #D1D5DB;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: center;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #6B7280;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .usage-tips {
+            background: #FFFBEB;
+            border: 1px solid #FCD34D;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tab {
+                min-width: 100px;
+                font-size: 14px;
+                padding: 12px 10px;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧵 Threads Captions Manager</h1>
+            <p>Your Complete VA Captions Library - Organized & Ready to Use</p>
+        </header>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('all')">📋 All Captions</button>
+            <button class="nav-tab" onclick="switchTab('flirty')">💖 Flirty</button>
+            <button class="nav-tab" onclick="switchTab('engagement')">💬 Engagement</button>
+            <button class="nav-tab" onclick="switchTab('telegram')">📱 Telegram CTA</button>
+            <button class="nav-tab" onclick="switchTab('stats')">📊 Statistics</button>
+        </div>
+        
+        <div class="tab-content">
+            <!-- All Captions Tab -->
+            <div id="all" class="tab-pane active">
+                <div class="card">
+                    <h3>🔍 Search & Filter Captions</h3>
+                    <input type="text" class="search-box" id="searchInput" placeholder="Search captions..." onkeyup="filterCaptions()">
+                    
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="setFilter('all')">All</button>
+                        <button class="filter-btn" onclick="setFilter('flirty')">Flirty</button>
+                        <button class="filter-btn" onclick="setFilter('engagement')">Engagement</button>
+                        <button class="filter-btn" onclick="setFilter('telegram')">Telegram</button>
+                        <button class="filter-btn" onclick="setFilter('usa')">USA</button>
+                        <button class="filter-btn" onclick="setFilter('single')">Single</button>
+                    </div>
+                    
+                    <div class="usage-tips">
+                        <strong>💡 Pro Tip:</strong> Click the "Copy" button next to any caption to instantly copy it to your clipboard for pasting in Threads!
+                    </div>
+                    
+                    <div id="captionsList">
+                        <!-- Captions will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Flirty Captions Tab -->
+            <div id="flirty" class="tab-pane">
+                <div class="card">
+                    <h3>💖 Flirty & Romantic Captions</h3>
+                    <p style="color: #6B7280; margin-bottom: 20px;">Perfect for creating personal connections and engagement</p>
+                    <div id="flirtyCaptions">
+                        <!-- Flirty captions will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Engagement Captions Tab -->
+            <div id="engagement" class="tab-pane">
+                <div class="card">
+                    <h3>💬 High-Engagement Captions</h3>
+                    <p style="color: #6B7280; margin-bottom: 20px;">Designed to spark conversations and interactions</p>
+                    <div id="engagementCaptions">
+                        <!-- Engagement captions will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Telegram CTA Tab -->
+            <div id="telegram" class="tab-pane">
+                <div class="card">
+                    <h3>📱 Telegram Call-to-Action Captions</h3>
+                    <p style="color: #6B7280; margin-bottom: 20px;">Direct followers to your Telegram for continued conversation</p>
+                    <div id="telegramCaptions">
+                        <!-- Telegram captions will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statistics Tab -->
+            <div id="stats" class="tab-pane">
+                <div class="card">
+                    <h3>📊 Captions Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Total Captions</h3>
+                            <div class="value" id="totalCaptions">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Flirty Captions</h3>
+                            <div class="value" id="flirtyCount">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Engagement Captions</h3>
+                            <div class="value" id="engagementCount">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Telegram CTAs</h3>
+                            <div class="value" id="telegramCount">0</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 20px;">
+                    <h3>🎯 Usage Tips</h3>
+                    <div style="margin-top: 15px;">
+                        <p><strong>Best Practices:</strong></p>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Mix different caption types throughout the day</li>
+                            <li>Use flirty captions during peak engagement hours (8PM-1AM)</li>
+                            <li>Space out Telegram CTAs - don't use them in consecutive posts</li>
+                            <li>Test different captions to see which get the most engagement</li>
+                            <li>Rotate through all your captions to avoid repetition</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">Caption copied to clipboard!</div>
+
+    <script>
+        // Threads Captions Data
+        const threadsCaptions = [
+            { text: "Hello Threads..❤️ Bella", category: "engagement" },
+            { text: "Need a chat partner 💔🇺🇸", category: "flirty" },
+            { text: "Telegram chat 💬🗨", category: "telegram" },
+            { text: "I want a boyfriend🥵", category: "flirty" },
+            { text: "Are you married ? 💍", category: "engagement" },
+            { text: "I'm from USA 🇺🇸", category: "engagement" },
+            { text: "Who uses Telegram here? ✅", category: "telegram" },
+            { text: "Telegram ☣️🤎", category: "telegram" },
+            { text: "Do you smoke weed?🙂‍↕️", category: "engagement" },
+            { text: "Telegram or insta ? 💕", category: "engagement" },
+            { text: "I'm single. We can flirt 🤗 🥂", category: "flirty" },
+            { text: "I meet you.... 💕💕 before", category: "flirty" },
+            { text: "Hey can we be friends😍", category: "engagement" },
+            { text: "Fck I wanna smoke😫", category: "engagement" },
+            { text: "Any stoners here?☁️🍃", category: "engagement" },
+            { text: "Who got Snapchat 👻 ?", category: "engagement" },
+            { text: "is anyone here divorced?!", category: "engagement" },
+            { text: "I'm single. We can flirt 🤗", category: "flirty" },
+            { text: "I Need A Content Partner 😮‍💨", category: "engagement" },
+            { text: "Who uses Telegram here?", category: "telegram" },
+            { text: "Telegram?💙", category: "telegram" },
+            { text: "Hello Threads..❤️", category: "engagement" },
+            { text: "I am alone my room", category: "flirty" },
+            { text: "Telegram 🫶🏼", category: "telegram" },
+            { text: "I'm drunk asf, wyd?", category: "flirty" },
+            { text: "I refuse to wear PANTIES!🤫🤫", category: "flirty" },
+            { text: "Can you eat my cupcake?🧁", category: "flirty" },
+            { text: "Hi threads 👋☺️I'm single af🥹", category: "flirty" },
+            { text: "I love morning wood🪵", category: "flirty" },
+            { text: "WhatsApp ❤️", category: "engagement" },
+            { text: "i want you now ❤️", category: "flirty" },
+            { text: "Telegram 🖤", category: "telegram" },
+            { text: "I love morning wood🪵", category: "flirty" },
+            { text: "Drop your instagram username ✨", category: "engagement" },
+            { text: "Who is older than 34", category: "engagement" },
+            { text: "Should I sit on it?", category: "flirty" },
+            { text: "Send me your TG📞", category: "telegram" },
+            { text: "i need drugs.", category: "engagement" },
+            { text: "Back door or front door?👀🫣", category: "flirty" },
+            { text: "Friends with benefits?", category: "flirty" },
+            { text: "I wanna meet you", category: "flirty" },
+            { text: "Telegram chat 💬", category: "telegram" },
+            { text: "home alone :) wanna come over?🙈", category: "flirty" },
+            { text: "i'm drunk, i want attention", category: "flirty" },
+            { text: "tg??💗❤️", category: "telegram" },
+            { text: "Video call in WhatsApp?🟢", category: "engagement" },
+            { text: "Can I follow you 😍❤️🥰", category: "engagement" },
+            { text: "Gym this morning?", category: "engagement" },
+            { text: "I really like you 🥺💞", category: "flirty" },
+            { text: "hey single🥰😘", category: "flirty" },
+            { text: "I'm fucking want a boyfriend 🥺", category: "flirty" },
+            { text: "Telegram chat 💬🤤", category: "telegram" },
+            { text: "I'm single as fuck 🥺💓", category: "flirty" },
+            { text: "Nobody 😇🥰hard rn?🥺", category: "flirty" },
+            { text: "Video call", category: "engagement" },
+            { text: "Video 💌 ♥️ to open", category: "engagement" },
+            { text: "who needs a hawk tuahh 🌝", category: "engagement" },
+            { text: "shower together?🥰", category: "flirty" },
+            { text: "Hi threads ❤️ ✨", category: "engagement" },
+            { text: "Who's from UK? 🇬🇧", category: "engagement" },
+            { text: "Who needs a B job😩❤️", category: "flirty" },
+            { text: "Telegram chat 💬❤️", category: "telegram" },
+            { text: "Who's from CANADA 🇨🇦?", category: "engagement" },
+            { text: "Baby i want you!", category: "flirty" },
+            { text: "And yes I swallow 🤭☺️", category: "flirty" },
+            { text: "I love morning wood🪵🤤🙂‍↔️", category: "flirty" },
+            { text: "Who's from USA? 🇺🇸", category: "engagement" },
+            { text: "Who uses TG here? ✅", category: "telegram" }
+        ];
+
+        // Captions Manager Class
+        class CaptionsManager {
+            constructor() {
+                this.currentFilter = 'all';
+                this.searchTerm = '';
+                this.init();
+            }
+
+            init() {
+                this.renderAllCaptions();
+                this.renderCategoryCaptions();
+                this.updateStatistics();
+            }
+
+            renderAllCaptions() {
+                const container = document.getElementById('captionsList');
+                const filteredCaptions = this.getFilteredCaptions();
+                
+                if (filteredCaptions.length === 0) {
+                    container.innerHTML = '<p>No captions found matching your criteria.</p>';
+                    return;
+                }
+
+                container.innerHTML = filteredCaptions.map((caption, index) => `
+                    <div class="caption-item">
+                        <div class="caption-text">
+                            <span class="category-badge">${this.getCategoryLabel(caption.category)}</span>
+                            ${caption.text}
+                        </div>
+                        <button class="btn-copy" onclick="copyCaption('${caption.text.replace(/'/g, "\\'")}')">Copy</button>
+                    </div>
+                `).join('');
+            }
+
+            renderCategoryCaptions() {
+                // Render flirty captions
+                const flirtyContainer = document.getElementById('flirtyCaptions');
+                const flirtyCaptions = threadsCaptions.filter(caption => caption.category === 'flirty');
+                flirtyContainer.innerHTML = flirtyCaptions.map(caption => `
+                    <div class="caption-item">
+                        <div class="caption-text">${caption.text}</div>
+                        <button class="btn-copy" onclick="copyCaption('${caption.text.replace(/'/g, "\\'")}')">Copy</button>
+                    </div>
+                `).join('');
+
+                // Render engagement captions
+                const engagementContainer = document.getElementById('engagementCaptions');
+                const engagementCaptions = threadsCaptions.filter(caption => caption.category === 'engagement');
+                engagementContainer.innerHTML = engagementCaptions.map(caption => `
+                    <div class="caption-item">
+                        <div class="caption-text">${caption.text}</div>
+                        <button class="btn-copy" onclick="copyCaption('${caption.text.replace(/'/g, "\\'")}')">Copy</button>
+                    </div>
+                `).join('');
+
+                // Render telegram captions
+                const telegramContainer = document.getElementById('telegramCaptions');
+                const telegramCaptions = threadsCaptions.filter(caption => caption.category === 'telegram');
+                telegramContainer.innerHTML = telegramCaptions.map(caption => `
+                    <div class="caption-item">
+                        <div class="caption-text">${caption.text}</div>
+                        <button class="btn-copy" onclick="copyCaption('${caption.text.replace(/'/g, "\\'")}')">Copy</button>
+                    </div>
+                `).join('');
+            }
+
+            getFilteredCaptions() {
+                let filtered = threadsCaptions;
+
+                // Apply category filter
+                if (this.currentFilter !== 'all') {
+                    if (this.currentFilter === 'usa') {
+                        filtered = filtered.filter(caption => caption.text.includes('USA') || caption.text.includes('🇺🇸'));
+                    } else if (this.currentFilter === 'single') {
+                        filtered = filtered.filter(caption => caption.text.toLowerCase().includes('single'));
+                    } else {
+                        filtered = filtered.filter(caption => caption.category === this.currentFilter);
+                    }
+                }
+
+                // Apply search filter
+                if (this.searchTerm) {
+                    const term = this.searchTerm.toLowerCase();
+                    filtered = filtered.filter(caption => 
+                        caption.text.toLowerCase().includes(term)
+                    );
+                }
+
+                return filtered;
+            }
+
+            getCategoryLabel(category) {
+                const labels = {
+                    'flirty': '💖 Flirty',
+                    'engagement': '💬 Engagement', 
+                    'telegram': '📱 Telegram'
+                };
+                return labels[category] || category;
+            }
+
+            updateStatistics() {
+                document.getElementById('totalCaptions').textContent = threadsCaptions.length;
+                document.getElementById('flirtyCount').textContent = threadsCaptions.filter(c => c.category === 'flirty').length;
+                document.getElementById('engagementCount').textContent = threadsCaptions.filter(c => c.category === 'engagement').length;
+                document.getElementById('telegramCount').textContent = threadsCaptions.filter(c => c.category === 'telegram').length;
+            }
+
+            filterCaptions(searchTerm) {
+                this.searchTerm = searchTerm.toLowerCase();
+                this.renderAllCaptions();
+            }
+
+            setFilter(filter) {
+                this.currentFilter = filter;
+                
+                // Update filter buttons
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                event.target.classList.add('active');
+                
+                this.renderAllCaptions();
+            }
+        }
+
+        // Global functions
+        let captionsManager;
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-pane').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(button => button.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function filterCaptions() {
+            const searchTerm = document.getElementById('searchInput').value;
+            captionsManager.filterCaptions(searchTerm);
+        }
+
+        function setFilter(filter) {
+            captionsManager.setFilter(filter);
+        }
+
+        function copyCaption(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('Caption copied to clipboard! 📋');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showNotification('Caption copied to clipboard! 📋');
+            });
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 2000);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            captionsManager = new CaptionsManager();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threads VA Post Scheduler</title>
+    <style>
+        :root {
+            --primary: #8B5CF6;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --dark: #1F2937;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--dark);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: #F3F4F6;
+            border-bottom: 2px solid #E5E7EB;
+        }
+        
+        .nav-tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tab.active {
+            background: white;
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            padding: 30px;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        .grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        
+        .card {
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .schedule-item {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .time-badge {
+            background: var(--primary);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .account-badge {
+            background: var(--success);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #E5E7EB;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            transition: width 0.3s ease;
+        }
+        
+        .form-group {
+            margin: 15px 0;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #D1D5DB;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .captions-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            padding: 10px;
+        }
+        
+        .caption-item {
+            padding: 8px;
+            border-bottom: 1px solid #F3F4F6;
+            cursor: pointer;
+        }
+        
+        .caption-item:hover {
+            background: #F3F4F6;
+        }
+        
+        .caption-item.selected {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧵 Threads VA Post Scheduler</h1>
+            <p>Automate Your Posting Schedule Following SOP Guidelines</p>
+        </header>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('scheduler')">📅 Scheduler</button>
+            <button class="nav-tab" onclick="switchTab('accounts')">👥 Accounts</button>
+            <button class="nav-tab" onclick="switchTab('captions')">📝 Captions</button>
+            <button class="nav-tab" onclick="switchTab('analytics')">📊 Analytics</button>
+        </div>
+        
+        <div class="tab-content">
+            <!-- Scheduler Tab -->
+            <div id="scheduler" class="tab-pane active">
+                <div class="grid">
+                    <div class="card">
+                        <h3>🎯 Quick Schedule Setup</h3>
+                        <div class="form-group">
+                            <label>Posting Method:</label>
+                            <select id="postingMethod">
+                                <option value="spam">SPAM Method (4 posts)</option>
+                                <option value="3text1pic">3Text-1Pic Method</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Start Time:</label>
+                            <input type="time" id="startTime" value="22:00">
+                        </div>
+                        <div class="form-group">
+                            <label>Posting Interval (minutes):</label>
+                            <input type="number" id="postInterval" value="30" min="15" max="60">
+                        </div>
+                        <div class="form-group">
+                            <label>Daily Posting Hours:</label>
+                            <input type="number" id="postingHours" value="8" min="4" max="12">
+                        </div>
+                        <button class="btn btn-primary" onclick="generateSchedule()">🔄 Generate Schedule</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📋 Today's Schedule</h3>
+                        <div id="scheduleList">
+                            <p>Generate a schedule to see your posting plan</p>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="scheduleProgress" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <p>Completed: <span id="completedPosts">0</span>/<span id="totalPosts">0</span> posts</p>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 20px;">
+                    <h3>⏰ Active Schedule</h3>
+                    <div id="activeSchedule"></div>
+                    <div style="margin-top: 15px;">
+                        <button class="btn btn-success" onclick="startScheduler()" id="startBtn">▶ Start Scheduler</button>
+                        <button class="btn btn-warning" onclick="pauseScheduler()" id="pauseBtn" style="display: none;">⏸ Pause</button>
+                        <button class="btn" onclick="resetScheduler()" style="background: #6B7280; color: white;">🔄 Reset</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Accounts Tab -->
+            <div id="accounts" class="tab-pane">
+                <div class="card">
+                    <h3>👥 Manage Accounts</h3>
+                    <button class="btn btn-primary" onclick="showAccountForm()">+ Add Account</button>
+                    <div id="accountsList" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+            
+            <!-- Captions Tab -->
+            <div id="captions" class="tab-pane">
+                <div class="grid">
+                    <div class="card">
+                        <h3>📝 Caption Library</h3>
+                        <div class="form-group">
+                            <label>Search Captions:</label>
+                            <input type="text" id="searchCaptions" placeholder="Search...">
+                        </div>
+                        <div class="captions-list" id="captionsList">
+                            <!-- Captions will be loaded here -->
+                        </div>
+                        <button class="btn btn-primary" onclick="loadDefaultCaptions()">📥 Load Default Captions</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>✏️ Custom Caption</h3>
+                        <div class="form-group">
+                            <label>Caption Text:</label>
+                            <textarea id="customCaption" rows="4" placeholder="Enter your custom caption..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Caption Type:</label>
+                            <select id="captionType">
+                                <option value="regular">Regular Post</option>
+                                <option value="first">First Post</option>
+                                <option value="viral">Viral Caption</option>
+                                <option value="cta">CTA Caption</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-success" onclick="addCustomCaption()">💾 Save Caption</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Analytics Tab -->
+            <div id="analytics" class="tab-pane">
+                <div class="grid">
+                    <div class="card">
+                        <h3>📊 Performance Stats</h3>
+                        <div id="performanceStats">
+                            <p>Total Posts Scheduled: <span id="totalScheduled">0</span></p>
+                            <p>Posts Completed: <span id="postsCompleted">0</span></p>
+                            <p>Success Rate: <span id="successRate">0%</span></p>
+                            <p>Estimated Views: <span id="estimatedViews">0</span></p>
+                            <p>Potential Earnings: <span id="potentialEarnings">$0</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📈 Best Performing Times</h3>
+                        <div id="bestTimes">
+                            <p>Data will appear after posting</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Form Modal -->
+    <div id="accountModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Add Threads Account</h3>
+            <div class="form-group">
+                <label>Account Username:</label>
+                <input type="text" id="accountUsername" placeholder="e.g., tiny_rae">
+            </div>
+            <div class="form-group">
+                <label>Posting Method:</label>
+                <select id="accountMethod">
+                    <option value="spam">SPAM Method</option>
+                    <option value="3text1pic">3Text-1Pic Method</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Status:</label>
+                <select id="accountStatus">
+                    <option value="active">Active</option>
+                    <option value="warmup">Warm-up</option>
+                    <option value="paused">Paused</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-primary" onclick="saveAccount()">💾 Save Account</button>
+                <button class="btn" style="background: #6B7280; color: white;" onclick="hideModal('accountModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Threads Scheduler Class
+        class ThreadsScheduler {
+            constructor() {
+                this.accounts = JSON.parse(localStorage.getItem('threads_accounts')) || [];
+                this.schedule = JSON.parse(localStorage.getItem('threads_schedule')) || [];
+                this.captions = JSON.parse(localStorage.getItem('threads_captions')) || [];
+                this.analytics = JSON.parse(localStorage.getItem('threads_analytics')) || {
+                    totalScheduled: 0,
+                    completed: 0,
+                    estimatedViews: 0
+                };
+                this.isRunning = false;
+                this.currentTimer = null;
+                this.init();
+            }
+
+            init() {
+                this.loadAccounts();
+                this.loadCaptions();
+                this.updateAnalytics();
+                this.checkForScheduledPosts();
+            }
+
+            generateSchedule(method, startTime, interval, hours) {
+                const schedule = [];
+                const start = new Date();
+                const [startHour, startMinute] = startTime.split(':');
+                start.setHours(parseInt(startHour), parseInt(startMinute), 0, 0);
+                
+                const totalPosts = Math.floor((hours * 60) / interval);
+                let postCount = 0;
+                
+                // First post (pinned)
+                if (method === 'spam') {
+                    schedule.push({
+                        time: new Date(start),
+                        account: this.getRandomAccount(),
+                        caption: this.getCaption('first'),
+                        type: 'first',
+                        pinned: true,
+                        completed: false
+                    });
+                    postCount++;
+                    start.setMinutes(start.getMinutes() + 5); // Wait 5 minutes after first post
+                }
+                
+                // Regular posts
+                while (postCount < totalPosts) {
+                    const postType = method === '3text1pic' && (postCount % 4 === 3) ? 'image' : 'text';
+                    const captionType = postType === 'image' ? 'cta' : 'regular';
+                    
+                    schedule.push({
+                        time: new Date(start),
+                        account: this.getRandomAccount(),
+                        caption: this.getCaption(captionType),
+                        type: postType,
+                        pinned: false,
+                        completed: false
+                    });
+                    
+                    start.setMinutes(start.getMinutes() + interval);
+                    postCount++;
+                }
+                
+                this.schedule = schedule;
+                this.saveData();
+                this.renderSchedule();
+                return schedule;
+            }
+
+            getRandomAccount() {
+                const activeAccounts = this.accounts.filter(acc => acc.status === 'active');
+                return activeAccounts.length > 0 ? activeAccounts[Math.floor(Math.random() * activeAccounts.length)] : { username: 'No accounts' };
+            }
+
+            getCaption(type) {
+                const filtered = this.captions.filter(caption => caption.type === type);
+                return filtered.length > 0 ? filtered[Math.floor(Math.random() * filtered.length)].text : 'Default caption';
+            }
+
+            startScheduler() {
+                if (this.isRunning) return;
+                
+                this.isRunning = true;
+                document.getElementById('startBtn').style.display = 'none';
+                document.getElementById('pauseBtn').style.display = 'inline-block';
+                
+                this.checkForScheduledPosts();
+                this.currentTimer = setInterval(() => {
+                    this.checkForScheduledPosts();
+                }, 60000); // Check every minute
+                
+                this.showNotification('Scheduler started! 🚀', 'success');
+            }
+
+            pauseScheduler() {
+                this.isRunning = false;
+                document.getElementById('startBtn').style.display = 'inline-block';
+                document.getElementById('pauseBtn').style.display = 'none';
+                
+                if (this.currentTimer) {
+                    clearInterval(this.currentTimer);
+                    this.currentTimer = null;
+                }
+                
+                this.showNotification('Scheduler paused ⏸', 'warning');
+            }
+
+            checkForScheduledPosts() {
+                const now = new Date();
+                let completedCount = 0;
+                
+                this.schedule.forEach((post, index) => {
+                    if (!post.completed && post.time <= now) {
+                        // Simulate posting (in real use, this would trigger actual posting)
+                        this.schedule[index].completed = true;
+                        this.analytics.completed++;
+                        this.analytics.estimatedViews += this.estimateViews();
+                        completedCount++;
+                        
+                        this.showNotification(`Posted to @${post.account.username} 📤`, 'success');
+                    }
+                    
+                    if (post.completed) {
+                        completedCount++;
+                    }
+                });
+                
+                if (completedCount > 0) {
+                    this.saveData();
+                    this.renderSchedule();
+                    this.updateAnalytics();
+                }
+            }
+
+            estimateViews() {
+                // Simple view estimation based on account performance
+                return Math.floor(Math.random() * 200) + 50; // 50-250 views per post
+            }
+
+            renderSchedule() {
+                const container = document.getElementById('scheduleList');
+                const activeContainer = document.getElementById('activeSchedule');
+                
+                if (this.schedule.length === 0) {
+                    container.innerHTML = '<p>No schedule generated yet</p>';
+                    activeContainer.innerHTML = '<p>No active schedule</p>';
+                    return;
+                }
+                
+                const now = new Date();
+                let upcomingHTML = '';
+                let activeHTML = '';
+                let completedCount = 0;
+                
+                this.schedule.forEach((post, index) => {
+                    const timeStr = post.time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    const isUpcoming = post.time > now && !post.completed;
+                    const isActive = post.time <= now && !post.completed;
+                    
+                    const postHTML = `
+                        <div class="schedule-item" style="border-left: 4px solid ${post.completed ? '#10B981' : isActive ? '#F59E0B' : '#8B5CF6'};">
+                            <div>
+                                <div class="time-badge">${timeStr}</div>
+                                <div style="margin-top: 5px;">
+                                    <strong>${post.account.username}</strong>
+                                    <span class="account-badge">${post.type}</span>
+                                    ${post.pinned ? '📌' : ''}
+                                </div>
+                                <div style="font-size: 12px; color: #6B7280; margin-top: 5px;">
+                                    ${post.caption.length > 50 ? post.caption.substring(0, 50) + '...' : post.caption}
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="color: ${post.completed ? '#10B981' : '#6B7280'}">
+                                    ${post.completed ? '✅ Completed' : isActive ? '🟡 Now' : '⏰ Upcoming'}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    if (post.completed) completedCount++;
+                    
+                    if (isUpcoming || isActive) {
+                        activeHTML += postHTML;
+                    }
+                    
+                    upcomingHTML += postHTML;
+                });
+                
+                container.innerHTML = upcomingHTML || '<p>No upcoming posts</p>';
+                activeContainer.innerHTML = activeHTML || '<p>No active posts</p>';
+                
+                // Update progress
+                const progress = (completedCount / this.schedule.length) * 100;
+                document.getElementById('scheduleProgress').style.width = progress + '%';
+                document.getElementById('completedPosts').textContent = completedCount;
+                document.getElementById('totalPosts').textContent = this.schedule.length;
+            }
+
+            loadAccounts() {
+                const container = document.getElementById('accountsList');
+                
+                if (this.accounts.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #6B7280;">
+                            <h3>No accounts yet</h3>
+                            <p>Add your Threads accounts to start scheduling</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = this.accounts.map((account, index) => `
+                    <div class="schedule-item">
+                        <div>
+                            <strong>@${account.username}</strong>
+                            <span class="account-badge">${account.method}</span>
+                            <span style="color: ${account.status === 'active' ? '#10B981' : account.status === 'warmup' ? '#F59E0B' : '#EF4444'}; margin-left: 10px;">
+                                ${account.status}
+                            </span>
+                        </div>
+                        <div>
+                            <button class="btn" onclick="editAccount(${index})">Edit</button>
+                            <button class="btn" style="background: var(--danger);" onclick="deleteAccount(${index})">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            loadCaptions() {
+                const container = document.getElementById('captionsList');
+                
+                if (this.captions.length === 0) {
+                    container.innerHTML = '<p>No captions loaded. Add some or load defaults.</p>';
+                    return;
+                }
+                
+                container.innerHTML = this.captions.map((caption, index) => `
+                    <div class="caption-item" onclick="selectCaption(${index})">
+                        <strong>${caption.type.toUpperCase()}</strong>
+                        <div style="font-size: 12px; margin-top: 2px;">${caption.text}</div>
+                    </div>
+                `).join('');
+            }
+
+            loadDefaultCaptions() {
+                const defaultCaptions = [
+                    { type: 'first', text: "Hi threads, I'm Rae ❤️" },
+                    { type: 'regular', text: "Just thinking about how amazing this community is! 💫" },
+                    { type: 'regular', text: "Someone tell me a secret 🤫" },
+                    { type: 'regular', text: "What's everyone working on today? 👀" },
+                    { type: 'viral', text: "This might get me in trouble but... 😈" },
+                    { type: 'viral', text: "Unpopular opinion: ______" },
+                    { type: 'cta', text: "Check my bio for exclusive content 💋" },
+                    { type: 'cta', text: "DM me for custom requests 🔥" },
+                    { type: 'cta', text: "Link in bio for special treats 🎁" }
+                ];
+                
+                this.captions = [...this.captions, ...defaultCaptions];
+                this.saveData();
+                this.loadCaptions();
+                this.showNotification('Default captions loaded! 📝', 'success');
+            }
+
+            addCustomCaption() {
+                const text = document.getElementById('customCaption').value;
+                const type = document.getElementById('captionType').value;
+                
+                if (!text.trim()) {
+                    this.showNotification('Please enter caption text', 'danger');
+                    return;
+                }
+                
+                this.captions.push({ type, text });
+                this.saveData();
+                this.loadCaptions();
+                
+                document.getElementById('customCaption').value = '';
+                this.showNotification('Custom caption saved! 💾', 'success');
+            }
+
+            updateAnalytics() {
+                document.getElementById('totalScheduled').textContent = this.analytics.totalScheduled;
+                document.getElementById('postsCompleted').textContent = this.analytics.completed;
+                
+                const successRate = this.analytics.totalScheduled > 0 ? 
+                    Math.round((this.analytics.completed / this.analytics.totalScheduled) * 100) : 0;
+                document.getElementById('successRate').textContent = successRate + '%';
+                
+                document.getElementById('estimatedViews').textContent = this.analytics.estimatedViews.toLocaleString();
+                
+                const earnings = (this.analytics.estimatedViews / 1000) * 5;
+                document.getElementById('potentialEarnings').textContent = '$' + earnings.toFixed(2);
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.style.background = type === 'success' ? '#10B981' : type === 'warning' ? '#F59E0B' : '#EF4444';
+                notification.style.display = 'block';
+                
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+            }
+
+            saveData() {
+                localStorage.setItem('threads_accounts', JSON.stringify(this.accounts));
+                localStorage.setItem('threads_schedule', JSON.stringify(this.schedule));
+                localStorage.setItem('threads_captions', JSON.stringify(this.captions));
+                localStorage.setItem('threads_analytics', JSON.stringify(this.analytics));
+            }
+        }
+
+        // Global instance and functions
+        let scheduler;
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-pane').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(button => button.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Schedule functions
+        function generateSchedule() {
+            const method = document.getElementById('postingMethod').value;
+            const startTime = document.getElementById('startTime').value;
+            const interval = parseInt(document.getElementById('postInterval').value);
+            const hours = parseInt(document.getElementById('postingHours').value);
+            
+            scheduler.analytics.totalScheduled += Math.floor((hours * 60) / interval);
+            scheduler.generateSchedule(method, startTime, interval, hours);
+            scheduler.showNotification('Schedule generated! 📅', 'success');
+        }
+
+        function startScheduler() {
+            scheduler.startScheduler();
+        }
+
+        function pauseScheduler() {
+            scheduler.pauseScheduler();
+        }
+
+        function resetScheduler() {
+            scheduler.schedule = [];
+            scheduler.saveData();
+            scheduler.renderSchedule();
+            scheduler.showNotification('Schedule reset 🔄', 'warning');
+        }
+
+        // Account functions
+        function showAccountForm() {
+            document.getElementById('accountModal').style.display = 'flex';
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function saveAccount() {
+            const username = document.getElementById('accountUsername').value;
+            const method = document.getElementById('accountMethod').value;
+            const status = document.getElementById('accountStatus').value;
+            
+            if (!username) {
+                scheduler.showNotification('Please enter username', 'danger');
+                return;
+            }
+            
+            scheduler.accounts.push({ username, method, status });
+            scheduler.saveData();
+            scheduler.loadAccounts();
+            hideModal('accountModal');
+            
+            // Clear form
+            document.getElementById('accountUsername').value = '';
+        }
+
+        function deleteAccount(index) {
+            if (confirm('Delete this account?')) {
+                scheduler.accounts.splice(index, 1);
+                scheduler.saveData();
+                scheduler.loadAccounts();
+            }
+        }
+
+        // Caption functions
+        function selectCaption(index) {
+            const items = document.querySelectorAll('.caption-item');
+            items.forEach(item => item.classList.remove('selected'));
+            items[index].classList.add('selected');
+        }
+
+        function addCustomCaption() {
+            scheduler.addCustomCaption();
+        }
+
+        function loadDefaultCaptions() {
+            scheduler.loadDefaultCaptions();
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            scheduler = new ThreadsScheduler();
+        });
+
+        // Modal background click to close
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
